@@ -1467,15 +1467,18 @@ async function initStudio() {
     };
 
     // Probe if local Node server (for yt-dlp and .env key) is running
+    let hasServerKey = false;
     try {
       const probe = await fetch('./api/catalog', { method: 'GET' });
       const contentType = probe.headers.get('content-type') || '';
       if (probe.ok && contentType.includes('application/json')) {
         const probeJson = await probe.json();
         hasLocalBackend = Boolean(probeJson?.ragas);
+        hasServerKey = Boolean(probeJson?.engine?.liveJevReady);
       }
     } catch {
       hasLocalBackend = false;
+      hasServerKey = false;
     }
 
     const ytFetchBar = document.querySelector('.youtube-fetch-bar');
@@ -1486,7 +1489,7 @@ async function initStudio() {
 
     // If there is no TypeSafe API key (neither browser BYOK nor local backend .env),
     // automatically switch to OpenJev Local WASM and load the local model in the browser.
-    if (!hasLocalBackend && !getBrowserApiKey() && engineModeSelect) {
+    if (!hasServerKey && !getBrowserApiKey() && engineModeSelect) {
       engineModeSelect.value = 'openjev:qwen3-0.6b';
       syncEngineModeUI();
     }

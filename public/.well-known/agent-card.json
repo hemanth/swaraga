@@ -1,0 +1,13 @@
+{
+  "name": "swaraga",
+  "description": "Indian Classical Raga Audio Classifier powered by 12-Swara YIN Pitch Telemetry, TypeSafe System One (Jev), and OpenJev Local Browser WASM",
+  "url": "https://h3manth.com/fun/swaraga/",
+  "repository": "https://github.com/hemanth/swaraga",
+  "model": "jev-latest",
+  "localFallbackModel": "openjev/qwen3-0.6b",
+  "sdk": "@typesafe-ai/sdk",
+  "endpoints": {
+    "llmsTxt": "./llms.txt",
+    "architecture": "./architecture-diagram.html"
+  }
+}

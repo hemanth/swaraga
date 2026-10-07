@@ -1,0 +1,13 @@
+# Swaraga — Indian Classical Raga Audio Classifier (DSP + TypeSafe System One & OpenJev WASM)
+
+> Classify Hindustani and Carnatic ragas from human vocal MP3/WAV recordings or live microphone singing using 12-swarasthana YIN pitch telemetry and TypeSafe System One (`jev-latest`) or local in-browser OpenJev WASM (`Qwen3-0.6B`, `MiniCPM5-2B`, `Qwen3.5-4B`).
+
+- Live Studio: https://h3manth.com/fun/swaraga/
+- Repository: https://github.com/hemanth/swaraga
+- Architecture Blueprint: https://h3manth.com/fun/swaraga/architecture-diagram.html
+
+## Capabilities
+
+1. **16 kHz YIN Pitch & Shadja (`Sa`) Lock**: Extracts microtonal F0 trajectories (`0–1200¢`), 12-swara dwell histograms, Arohana/Avarohana runs, and Pakad n-gram motifs in the browser via Web Audio API.
+2. **TypeSafe System One (`jev-latest`)**: Evaluates 10 batched primitives (`choice`, `score`, `noul`) and computes hierarchical beam scores `√(P(Thaat) × P(Raga))`.
+3. **OpenJev Local Browser WASM**: When no TypeSafe API key is provided, automatically loads and runs `Qwen3-0.6B` in-browser via `@wllama/wllama` using 1-token direct option logit readouts.
