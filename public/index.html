@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Swaraga — Classical Indian Raga Classifier</title>
+  <meta name="description" content="Drop an MP3 or sing a Raga. Progressive acoustic pitch contour and TypeSafe System One raga classification." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- Subtle Top Utility Bar -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="4" transform="rotate(45 12 12)" fill="#f05032"/>
+            <circle cx="12" cy="12" r="3.2" fill="#ececec"/>
+          </svg>
+        </span>
+        <span class="brand-name">Swaraga</span>
+      </div>
+
+      <div class="top-actions">
+        <button type="button" class="top-pill-btn" id="btn-toggle-engine" aria-expanded="false">
+          <span class="status-dot" id="engine-dot"></span>
+          <span id="engine-status-text">Engine: Jev / OpenJev</span>
+        </button>
+        <button type="button" class="top-pill-btn" id="btn-toggle-arch" aria-expanded="false">
+          <span>How It Works</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Collapsible Engine / API Key / OpenJev Drawer (Hidden by default so initial screen stays pure) -->
+    <div class="top-drawer" id="drawer-engine" hidden>
+      <div class="drawer-inner">
+        <div class="drawer-header">
+          <span class="drawer-title">DECISION ENGINE &amp; RUNTIME (TYPESAFE CLOUD BYOK OR OPENJEV LOCAL WASM)</span>
+          <button type="button" class="drawer-close" id="btn-close-engine">Close</button>
+        </div>
+        <div class="engine-controls-grid">
+          <div class="engine-mode-pills" role="group" aria-label="Inference Runtime Mode">
+            <button type="button" class="engine-mode-pill active" id="btn-mode-cloud">
+              TypeSafe Cloud API (BYOK / .env)
+            </button>
+            <button type="button" class="engine-mode-pill" id="btn-mode-openjev">
+              OpenJev Browser Local (Wllama)
+            </button>
+          </div>
+          <div class="decision-links-wrap">
+            <select id="engine-mode-select" class="studio-select" aria-label="Decision Engine Mode">
+              <option value="typesafe-cloud">TypeSafe Cloud · jev-latest (Hosted API)</option>
+              <option value="openjev:qwen3-0.6b">OpenJev Local · Qwen3-0.6B (~400MB GGUF)</option>
+              <option value="openjev:minicpm4-0.5b">OpenJev Local · MiniCPM4-0.5B (~315MB GGUF)</option>
+              <option value="openjev:minicpm-s-2b">OpenJev Local · MiniCPM5-2B (~1.2GB GGUF)</option>
+              <option value="openjev:qwen35-4b">OpenJev Local · Qwen3.5-4B (~2.7GB GGUF)</option>
+            </select>
+            <a href="https://openjev.com/" target="_blank" rel="noopener" class="openjev-link-badge">openjev.com ↗</a>
+          </div>
+        </div>
+
+        <div class="byok-key-group" id="byok-key-group">
+          <label for="jev-api-key-input" class="mono-label">JEV API KEY (BYOK):</label>
+          <div class="key-input-wrap">
+            <input
+              type="password"
+              id="jev-api-key-input"
+              class="studio-input key-input"
+              placeholder="Paste TypeSafe Jev API key (ts_...) — stored in localStorage"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="button" class="btn-inline-ghost" id="btn-toggle-key-vis">Show</button>
+          </div>
+          <button type="button" class="btn-primary-sm" id="btn-save-api-key">
+            <span id="save-key-label">Apply Key</span>
+          </button>
+          <button type="button" class="btn-secondary-sm" id="btn-clear-api-key">Clear</button>
+          <span class="mono-badge" id="api-key-status-badge">SERVER .ENV</span>
+        </div>
+
+        <div class="openjev-controls" id="openjev-controls" style="display: none;">
+          <span class="mono-label" id="openjev-status-text">
+            Runs open-weights GGUF in-browser via @wllama/wllama using 1-token direct logit readout (A..L).
+          </span>
+          <button type="button" class="btn-primary-sm" id="btn-load-openjev">
+            <span id="load-openjev-label">Load &amp; Run OpenJev Model</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible How It Works Architecture Blueprint Drawer (Hidden by default) -->
+    <div class="top-drawer" id="drawer-arch" hidden>
+      <div class="drawer-inner">
+        <div class="drawer-header">
+          <span class="drawer-title">HOW IT WORKS · SYSTEM ARCHITECTURE &amp; SIGNAL TOPOLOGY</span>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <a href="./architecture-diagram.html" target="_blank" rel="noopener" class="openjev-link-badge">
+              Open Fullscreen Diagram ↗
+            </a>
+            <button type="button" class="drawer-close" id="btn-close-arch">Close</button>
+          </div>
+        </div>
+        <p class="arch-intro">
+          Swaraga decouples <strong>deterministic acoustic signal processing</strong> (16 kHz Web Audio decode, Shadja tonic lock, despiked YIN F0 tracking, 12-Swara cent dwell histograms, and Arohana/Avarohana n-grams) from <strong>probabilistic musicological reasoning</strong> (10 parallel TypeSafe System One <code>choice</code>, <code>score</code>, and <code>noul</code> primitives).
+        </p>
+        <div class="arch-blueprint-frame">
+          <svg
+            class="arch-svg"
+            viewBox="0 0 1160 540"
+            role="img"
+            aria-labelledby="arch-svg-title arch-svg-desc"
+          >
+            <title id="arch-svg-title">Swaraga Hybrid Acoustic DSP and TypeSafe System One Architecture</title>
+            <desc id="arch-svg-desc">Three-stage architecture diagram showing Acoustic DSP Frontend on the left, System One State Compiler and Probabilistic Routing Gate in the center, and Hybrid Inference Runtimes (TypeSafe Jev Cloud API and OpenJev Browser Engine) on the right.</desc>
+            <defs>
+              <marker id="arch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#111111" />
+              </marker>
+            </defs>
+            <rect x="0" y="0" width="1160" height="540" rx="10" fill="#ffffff" />
+            <rect x="28" y="32" width="332" height="428" rx="10" fill="none" stroke="#111111" stroke-width="1.2" stroke-dasharray="5 5" />
+            <rect x="44" y="22" width="182" height="18" fill="#ffffff" />
+            <text x="50" y="35" font-family="'Geist Mono', monospace" font-size="10.5" font-weight="600" letter-spacing="1.4" fill="#111111">01 ACOUSTIC DSP TIER</text>
+
+            <rect x="414" y="32" width="332" height="428" rx="10" fill="none" stroke="#111111" stroke-width="1.2" stroke-dasharray="5 5" />
+            <rect x="430" y="22" width="220" height="18" fill="#ffffff" />
+            <text x="436" y="35" font-family="'Geist Mono', monospace" font-size="10.5" font-weight="600" letter-spacing="1.4" fill="#111111">02 SYSTEM ONE ORCHESTRATOR</text>
+
+            <rect x="800" y="32" width="332" height="428" rx="10" fill="none" stroke="#111111" stroke-width="1.2" stroke-dasharray="5 5" />
+            <rect x="816" y="22" width="222" height="18" fill="#ffffff" />
+            <text x="822" y="35" font-family="'Geist Mono', monospace" font-size="10.5" font-weight="600" letter-spacing="1.4" fill="#111111">03 INFERENCE &amp; PRIMITIVES</text>
+
+            <g>
+              <rect x="52" y="56" width="284" height="92" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
+              <rect x="66" y="68" width="64" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="98" y="80" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">INGEST</text>
+              <text x="194" y="102" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">Vocal Audio Input</text>
+              <text x="194" y="124" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">MP3 · WebAudio Mic · Saraga YT</text>
+            </g>
+            <g>
+              <rect x="52" y="198" width="284" height="92" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
+              <rect x="66" y="210" width="76" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="104" y="222" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">DSP / F0</text>
+              <text x="194" y="244" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">YIN Pitch &amp; Shadja Lock</text>
+              <text x="194" y="266" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">NSDF Autocorrelation · 7-pt Median</text>
+            </g>
+            <g>
+              <rect x="52" y="340" width="284" height="96" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
+              <rect x="66" y="352" width="84" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="108" y="364" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">TELEMETRY</text>
+              <text x="194" y="388" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">12-Swara &amp; Phrase Profiler</text>
+              <text x="194" y="410" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">1200¢ Histogram · Arohana N-Grams</text>
+            </g>
+            <g>
+              <rect x="438" y="112" width="284" height="114" rx="8" fill="#111111" stroke="#111111" stroke-width="1.5" />
+              <rect x="454" y="126" width="96" height="18" rx="2" fill="none" stroke="#ffffff" stroke-width="1" />
+              <text x="502" y="138" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#ffffff">CORE ENGINE</text>
+              <text x="580" y="168" text-anchor="middle" font-family="'Inter', sans-serif" font-size="15" font-weight="600" fill="#ffffff">System One State Compiler</text>
+              <text x="580" y="192" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#a1a1aa">10 Batched Primitives · JSON State</text>
+            </g>
+            <g>
+              <rect x="438" y="340" width="284" height="96" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
+              <rect x="454" y="352" width="76" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="492" y="364" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">ARBITER</text>
+              <text x="580" y="388" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">Probabilistic Routing Gate</text>
+              <text x="580" y="410" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">√(P(Thaat)×P(Raga)) · Harmonic Conf</text>
+            </g>
+            <g>
+              <rect x="824" y="56" width="284" height="92" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
+              <rect x="838" y="68" width="84" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="880" y="80" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">CLOUD API</text>
+              <text x="966" y="102" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">TypeSafe Jev Cloud API</text>
+              <text x="966" y="124" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">POST /v1/systemone · jev-latest</text>
+            </g>
+            <g>
+              <rect x="824" y="198" width="284" height="92" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" stroke-dasharray="4 3" />
+              <rect x="838" y="210" width="90" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="883" y="222" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">LOCAL WASM</text>
+              <text x="966" y="244" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">OpenJev Browser Engine</text>
+              <text x="966" y="266" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">wllama GGUF · Qwen3 / MiniCPM</text>
+            </g>
+            <g>
+              <rect x="824" y="340" width="284" height="96" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
+              <rect x="838" y="352" width="92" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
+              <text x="884" y="364" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">PRIMITIVES</text>
+              <text x="966" y="388" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">choice() · score() · noul()</text>
+              <text x="966" y="410" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">Thaat/Raga Dist · Gamaka · Vadi</text>
+            </g>
+            <path d="M 194 148 L 194 198" fill="none" stroke="#111111" stroke-width="1.3" marker-end="url(#arch-arrow)" />
+            <text x="204" y="176" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#111111">PCM 16KHZ</text>
+            <path d="M 194 290 L 194 340" fill="none" stroke="#111111" stroke-width="1.3" marker-end="url(#arch-arrow)" />
+            <text x="204" y="318" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#111111">F0 + SA HZ</text>
+            <path d="M 336 388 L 386 388 Q 394 388 394 380 L 394 177 Q 394 169 402 169 L 438 169" fill="none" stroke="#111111" stroke-width="1.3" marker-end="url(#arch-arrow)" />
+            <rect x="358" y="268" width="72" height="16" fill="#ffffff" />
+            <text x="394" y="279" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" fill="#111111">SWARA JSON</text>
+            <path d="M 722 150 L 766 150 Q 774 150 774 142 L 774 110 Q 774 102 782 102 L 824 102" fill="none" stroke="#111111" stroke-width="1.3" marker-end="url(#arch-arrow)" />
+            <rect x="742" y="118" width="64" height="15" fill="#ffffff" />
+            <text x="774" y="129" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" fill="#111111">BYOK API</text>
+            <path d="M 722 188 L 766 188 Q 774 188 774 196 L 774 236 Q 774 244 782 244 L 824 244" fill="none" stroke="#111111" stroke-width="1.3" stroke-dasharray="4 4" marker-end="url(#arch-arrow)" />
+            <rect x="740" y="208" width="68" height="15" fill="#ffffff" />
+            <text x="774" y="219" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" fill="#111111">WASM GGUF</text>
+            <path d="M 1108 102 L 1116 102 Q 1122 102 1122 110 L 1122 372 Q 1122 380 1114 380 L 1108 380" fill="none" stroke="#111111" stroke-width="1.3" marker-end="url(#arch-arrow)" />
+            <path d="M 966 290 L 966 340" fill="none" stroke="#111111" stroke-width="1.3" stroke-dasharray="4 4" marker-end="url(#arch-arrow)" />
+            <text x="976" y="318" font-family="'Geist Mono', monospace" font-size="9" font-weight="600" fill="#111111">10 LOGITS</text>
+            <path d="M 824 388 L 722 388" fill="none" stroke="#111111" stroke-width="1.3" marker-end="url(#arch-arrow)" />
+            <rect x="734" y="368" width="78" height="15" fill="#ffffff" />
+            <text x="773" y="378" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" fill="#111111">PROBS + CONF</text>
+            <path d="M 580 226 L 580 340" fill="none" stroke="#111111" stroke-width="1.3" stroke-dasharray="4 4" marker-end="url(#arch-arrow)" />
+            <rect x="538" y="274" width="84" height="16" fill="#ffffff" />
+            <text x="580" y="285" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" fill="#111111">GRAMMAR FIT</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-flow">
+    <!-- 1. THE HEADING -->
+    <section class="hero-stage">
+      <div class="hero-eyebrow">PROGRAMMABLE MUSICOLOGY · TYPESAFE SYSTEM ONE</div>
+      <h1>Drop an MP3 or sing a Raga.</h1>
+      <p class="hero-lead">
+        Upload a vocal clip, record 8 seconds from your microphone, or pick a classical recording below. Each analysis card renders progressively.
+      </p>
+    </section>
+
+    <!-- 2. JUST THE SINGLE DIV TO UPLOAD, RECORD, OR SELECT -->
+    <section class="ingest-card" id="ingest-stage-card">
+      <div class="ingest-dropzone" id="mp3-dropzone" role="button" tabindex="0" aria-label="Upload MP3 or WAV audio file">
+        <input type="file" id="mp3-file-input" accept="audio/mpeg,audio/mp3,audio/wav,audio/webm,audio/ogg,audio/*" hidden />
+        <div class="ingest-dropzone-text">
+          <h2 id="dropzone-title">Drop an .mp3 / .wav recording here, or sing into the microphone</h2>
+          <p id="dropzone-sub">Decoded locally at 16 kHz via Web Audio API · YIN F0 pitch contour + 10 parallel Jev judgments</p>
+        </div>
+        <div class="ingest-actions">
+          <button type="button" class="btn-action-primary" id="btn-browse-mp3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span>Upload MP3 / WAV</span>
+          </button>
+          <button type="button" class="btn-action-secondary" id="btn-mic-record">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            <span id="mic-btn-label">Sing / Record 8s</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="ingest-samples-bar">
+        <div class="ingest-samples-header">
+          <span class="samples-label">OR SELECT A CLASSICAL VOCAL RECORDING:</span>
+          <div class="samples-meta-controls">
+            <label for="tonic-select" class="tonic-inline-label">Sa Tonic:</label>
+            <select id="tonic-select" class="tonic-inline-select">
+              <option value="auto">Auto-Lock Sa</option>
+              <option value="C">C (Safed 1)</option>
+              <option value="C#">C# (Kali 1)</option>
+              <option value="D">D (Safed 2)</option>
+              <option value="D#">D# (Kali 2)</option>
+              <option value="E">E (Safed 3)</option>
+              <option value="F">F (Safed 4)</option>
+              <option value="F#">F# (Kali 3)</option>
+              <option value="G">G (Safed 5)</option>
+              <option value="G#">G# (Kali 4)</option>
+              <option value="A">A (Safed 6)</option>
+              <option value="A#">A# (Kali 5)</option>
+              <option value="B">B (Safed 7)</option>
+            </select>
+            <button type="button" class="btn-text-toggle" id="btn-toggle-yt">Paste YouTube URL</button>
+          </div>
+        </div>
+
+        <div class="sample-pills" id="sample-pills">
+          <!-- Populated by app.js -->
+        </div>
+
+        <div class="youtube-fetch-bar" id="youtube-fetch-row" hidden>
+          <input
+            type="text"
+            id="youtube-url-input"
+            class="studio-input"
+            placeholder="Paste any YouTube URL or search query (e.g. Raag Bhimpalasi vocal aroh avroh)..."
+          />
+          <button type="button" class="btn-action-secondary" id="btn-fetch-youtube">
+            <span id="yt-btn-label">Fetch YouTube Vocal</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SEQUENTIAL PROGRESSIVE CARDS STREAM (Empty on load; renders one div after another with animation) -->
+    <div class="progressive-stream" id="progressive-results" hidden>
+      <!-- DIV 1: WHICH RAGA IT IS (MONUMENTAL VERDICT CARD) -->
+      <section class="stream-card reveal-card winner-hero-card" data-reveal-step="1">
+        <div class="card-eyebrow-row">
+          <span class="step-tag"><span class="step-num">01</span> IDENTIFIED RAGA</span>
+          <span class="gate-badge" id="routing-gate-badge">AUTO_VERIFIED</span>
+        </div>
+
+        <div class="winner-main">
+          <div class="winner-title-col">
+            <div class="winner-eyebrow" id="winner-tradition">HINDUSTANI &amp; CARNATIC DUAL EQUIVALENCE</div>
+            <h2 class="winner-raga-name" id="winner-raga-name">—</h2>
+            <p class="winner-carnatic" id="winner-carnatic">Carnatic Equivalent: —</p>
+          </div>
+
+          <div class="winner-metrics">
+            <div class="metric-box">
+              <span class="metric-label">PROBABILITY</span>
+              <span class="metric-value" id="winner-prob">—</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">CONFIDENCE</span>
+              <span class="metric-value" id="winner-conf">—</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">BEAM SCORE</span>
+              <span class="metric-value" id="winner-beam">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="audio-player-bar">
+          <div class="audio-meta">
+            <span class="audio-track-title" id="active-track-name">No track loaded</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <a id="active-yt-link" href="https://www.youtube.com/watch?v=MW652897nBs" target="_blank" rel="noopener" class="yt-source-link" style="display:none;">YouTube Source ↗</a>
+              <span class="mono-badge" id="active-tonic-badge">Sa = — Hz</span>
+            </div>
+          </div>
+          <audio id="raga-audio-el" controls preload="metadata"></audio>
+        </div>
+
+        <div class="winner-grammar-grid">
+          <div class="grammar-item">
+            <span class="mono-label">PARENT THAAT</span>
+            <span class="mono-value" id="winner-thaat">—</span>
+          </div>
+          <div class="grammar-item">
+            <span class="mono-label">JATI &amp; VADI / SAMVADI</span>
+            <span class="mono-value" id="winner-vadi">—</span>
+          </div>
+          <div class="grammar-item">
+            <span class="mono-label">PRAHAR (SAMAY CHAKRA)</span>
+            <span class="mono-value" id="winner-prahar">—</span>
+          </div>
+          <div class="grammar-item">
+            <span class="mono-label">AROHA / AVAROHA</span>
+            <span class="mono-value" id="winner-scale">—</span>
+          </div>
+        </div>
+
+        <div class="pakad-banner">
+          <span class="mono-label">CANONICAL PAKAD:</span>
+          <span class="mono-value" id="winner-pakad">—</span>
+        </div>
+
+        <p class="routing-summary" id="routing-summary"></p>
+      </section>
+
+      <!-- DIV 2: F0 PITCH CONTOUR & SWARASTHANA CENT TRAJECTORY -->
+      <section class="stream-card reveal-card" data-reveal-step="2">
+        <div class="card-eyebrow-row">
+          <span class="step-tag"><span class="step-num">02</span> F0 PITCH CONTOUR &amp; SWARASTHANA TRAJECTORY</span>
+          <span class="mono-badge" id="contour-stats-badge">0 voiced frames</span>
+        </div>
+
+        <div class="contour-toolbar">
+          <div class="contour-legend">
+            <span class="legend-item"><i class="swatch-vadi"></i>Vadi / Samvadi</span>
+            <span class="legend-item"><i class="swatch-ribbon"></i>Held Swara (Svara-Lipi)</span>
+            <span class="legend-item"><i class="swatch-f0"></i>Continuous F0 Trajectory</span>
+          </div>
+          <span class="contour-live-badge" id="contour-live-badge">Hover or click contour to inspect Swara &amp; seek audio</span>
+        </div>
+
+        <div class="canvas-container">
+          <canvas id="pitch-contour-canvas" width="960" height="360"></canvas>
+        </div>
+
+        <div class="phrase-telemetry-bar">
+          <div>
+            <span class="mono-label">DETECTED AROHA:</span>
+            <span class="mono-value" id="dsp-aroha">—</span>
+          </div>
+          <div>
+            <span class="mono-label">DETECTED AVAROHA:</span>
+            <span class="mono-value" id="dsp-avaroha">—</span>
+          </div>
+          <div>
+            <span class="mono-label">TOP N-GRAM MOTIFS:</span>
+            <span class="mono-value" id="dsp-ngrams">—</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- DIV 3: 12-SWARA DWELL HISTOGRAM -->
+      <section class="stream-card reveal-card" data-reveal-step="3">
+        <div class="card-eyebrow-row">
+          <span class="step-tag"><span class="step-num">03</span> 12-SWARA DWELL HISTOGRAM (VADI / SAMVADI / VARJYA)</span>
+          <span class="mono-badge" id="detected-vadi-badge">Vadi: —</span>
+        </div>
+        <div class="swara-bars-grid" id="swara-bars-container">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </section>
+
+      <!-- DIV 4: CANDIDATE RAGAS (CHOICE PRIMITIVE) -->
+      <section class="stream-card reveal-card" data-reveal-step="4">
+        <div class="card-eyebrow-row">
+          <span class="step-tag"><span class="step-num">04</span> CANDIDATE RAGA PROBABILITIES</span>
+          <span class="mono-badge">choice()</span>
+        </div>
+        <p class="primitive-desc">
+          Calibrated probability distribution over candidate ragas combined with hierarchical parent Thaat beam score <code>√(P(Thaat) × P(Raga))</code>.
+        </p>
+        <div class="choice-list" id="choice-candidates-list">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- DIV 5: SCORE & NOUL PRIMITIVES -->
+      <section class="stream-card reveal-card" data-reveal-step="5">
+        <div class="card-eyebrow-row">
+          <span class="step-tag"><span class="step-num">05</span> MUSICOLOGICAL RUBRICS &amp; GRAMMAR VERIFIERS</span>
+          <span class="mono-badge">score() + noul()</span>
+        </div>
+        <div class="primitives-split-grid">
+          <div>
+            <h3 class="subcard-heading">Continuous Rubric Expectations (0.00 – 3.00)</h3>
+            <div class="score-cards" id="score-primitives-container">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+          <div>
+            <h3 class="subcard-heading">Calibrated Grammar Verifiers (0.00 – 1.00)</h3>
+            <div class="noul-cards" id="noul-primitives-container">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DIV 6: COLLAPSIBLE SYSTEM ONE PAYLOAD & 12-RAGA GRAMMAR REFERENCE -->
+      <details class="stream-card reveal-card details-card" data-reveal-step="6">
+        <summary class="details-summary">
+          <span class="step-tag"><span class="step-num">06</span> INSPECT RAW SYSTEM ONE JSON PAYLOAD &amp; 12-RAGA GRAMMAR</span>
+          <span class="mono-badge">Expand ▾</span>
+        </summary>
+        <div class="details-body">
+          <div class="inspector-header" style="margin-bottom:14px;">
+            <span class="mono-label">POST https://api.typesafe.ai/v1/systemone (model: "jev-latest")</span>
+            <button type="button" class="btn-secondary-sm" id="btn-copy-curl">
+              <span id="copy-curl-label">Copy curl</span>
+            </button>
+          </div>
+          <div class="inspector-split">
+            <div class="inspector-pane">
+              <div class="pane-title">REQUEST: STATE + 10 QUESTIONS</div>
+              <pre id="inspector-request-json" class="code-block">Loading...</pre>
+            </div>
+            <div class="inspector-pane">
+              <div class="pane-title">RESPONSE: CALIBRATED ANSWERS</div>
+              <pre id="inspector-response-json" class="code-block">Loading...</pre>
+            </div>
+          </div>
+          <div class="catalog-grid" id="catalog-grid" style="margin-top:24px;">
+            <!-- Populated by app.js -->
+          </div>
+        </div>
+      </details>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="./llms.txt">llms.txt</a>
+        <span>·</span>
+        <a href="./.well-known/agent-card.json">agent-card.json</a>
+        <span>·</span>
+        <a href="/api/catalog">/api/catalog</a>
+        <span>·</span>
+        <a href="./architecture-diagram.html">Architecture Blueprint</a>
+        <span>·</span>
+        <a href="https://docs.typesafe.ai/" target="_blank" rel="noopener">TypeSafe Docs</a>
+      </div>
+      <div class="footer-credit">
+        Made with <span style="color: #f05032;">&#9829;</span> <a href="https://h3manth.com" target="_blank" rel="noopener">Hemanth HM</a>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

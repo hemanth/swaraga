@@ -1,0 +1,30 @@
+{
+  "name": "swaraga",
+  "version": "1.0.0",
+  "description": "Swaraga — Indian Classical Raga Audio Classifier (Hindustani & Carnatic) powered by DSP Pitch Telemetry and TypeSafe System One (Jev)",
+  "type": "module",
+  "main": "src/classifier.js",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "generate-samples": "python3 scripts/generate-sample-mp3s.py",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "raga",
+    "indian-classical-music",
+    "hindustani",
+    "carnatic",
+    "audio-classification",
+    "dsp",
+    "swara",
+    "typesafe",
+    "jev",
+    "system-one"
+  ],
+  "author": "Hemanth HM <hemanth@h3manth.com> (https://h3manth.com)",
+  "license": "MIT",
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0"
+  }
+}
