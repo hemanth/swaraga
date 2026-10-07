@@ -1542,6 +1542,48 @@ async function initStudio() {
         await classifyBySampleUrl(matched.sampleUrl, false);
       }
     }
+
+    // Register WebMCP tools for Agent-Ready Level 5 browser agents
+    if (typeof navigator !== 'undefined' && 'modelContext' in navigator && navigator.modelContext?.registerTool) {
+      navigator.modelContext.registerTool({
+        name: 'list_ragas',
+        description: 'Return the 12 canonical Hindustani and Carnatic ragas, swarasthanas, parent Thaats, Vadi/Samvadi, and Pakad motifs.',
+        parameters: {
+          type: 'object',
+          properties: {
+            thaat: { type: 'string', description: 'Optional parent Thaat filter (e.g. Kalyan, Bhairav, Asavari)' }
+          }
+        },
+        handler: async ({ thaat } = {}) => {
+          const list = thaat
+            ? RAGA_CATALOG.filter((r) => r.thaat.toLowerCase() === String(thaat).toLowerCase())
+            : RAGA_CATALOG;
+          return { count: list.length, ragas: list };
+        }
+      });
+
+      navigator.modelContext.registerTool({
+        name: 'classify_sample_raga',
+        description: 'Classify one of the 6 reference vocal recordings (yaman, bhairav, bhupali, malkauns, darbari_kanada, hamsadhwani) and return its telemetry and System One probabilities.',
+        parameters: {
+          type: 'object',
+          properties: {
+            ragaId: { type: 'string', description: 'Sample raga ID to classify (e.g. yaman, bhairav, malkauns)' }
+          },
+          required: ['ragaId']
+        },
+        handler: async ({ ragaId }) => {
+          const matched = catalogData?.samples?.find(
+            (s) => s.id === ragaId || s.id.includes(String(ragaId || '').toLowerCase())
+          );
+          if (!matched) {
+            return { error: `Unknown sample ragaId: ${ragaId}` };
+          }
+          await classifyBySampleUrl(matched.sampleUrl, false);
+          return currentClassification;
+        }
+      });
+    }
   } catch (err) {
     console.error('Failed to initialize studio:', err);
   }

@@ -1,13 +1,39 @@
 {
-  "name": "swaraga",
-  "description": "Indian Classical Raga Audio Classifier powered by 12-Swara YIN Pitch Telemetry, TypeSafe System One (Jev), and OpenJev Local Browser WASM",
+  "$schema": "https://a2a-protocol.org/schemas/agent-card/v1.0.0.json",
+  "schemaVersion": "1.0.0",
+  "name": "Swaraga Raga Classifier Agent",
+  "description": "Autonomous Agent Card for Swaraga — classify Hindustani and Carnatic ragas from vocal audio via 12-swarasthana YIN pitch telemetry and TypeSafe System One (Jev) / OpenJev WASM.",
   "url": "https://h3manth.com/fun/swaraga/",
-  "repository": "https://github.com/hemanth/swaraga",
-  "model": "jev-latest",
-  "localFallbackModel": "openjev/qwen3-0.6b",
-  "sdk": "@typesafe-ai/sdk",
-  "endpoints": {
-    "llmsTxt": "./llms.txt",
-    "architecture": "./architecture-diagram.html"
+  "version": "1.0.0",
+  "capabilities": {
+    "tools": [
+      {
+        "name": "list_ragas",
+        "description": "Return the 12 canonical Hindustani and Carnatic ragas, swarasthanas, parent Thaats, Vadi/Samvadi, and Pakad motifs.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "thaat": { "type": "string", "description": "Optional parent Thaat filter (e.g. Kalyan, Bhairav, Asavari)" }
+          }
+        }
+      },
+      {
+        "name": "classify_sample_raga",
+        "description": "Classify one of the 6 reference vocal recordings (yaman, bhairav, bhupali, malkauns, darbari_kanada, hamsadhwani) and return its telemetry and System One probabilities.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "ragaId": { "type": "string", "description": "Sample raga ID to classify (e.g. yaman, bhairav, malkauns)" }
+          },
+          "required": ["ragaId"]
+        }
+      }
+    ]
+  },
+  "communication": {
+    "preferredChannel": "https",
+    "endpoints": {
+      "query": "https://h3manth.com/fun/swaraga/"
+    }
   }
 }

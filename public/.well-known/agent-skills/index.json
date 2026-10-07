@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "skills": [
+    {
+      "name": "swaraga-classifier",
+      "description": "Classify Hindustani and Carnatic ragas from vocal audio using 12-swarasthana YIN pitch telemetry and TypeSafe System One (Jev) or OpenJev WASM.",
+      "entrypoint": "/fun/swaraga/.well-known/agent-skills/swaraga-classifier/SKILL.md",
+      "sha256": "1fe95c68a6cf3775d67152b963d86c1e052f78a0bfd8b55a3176e9feeb8ff5ab"
+    }
+  ]
+}

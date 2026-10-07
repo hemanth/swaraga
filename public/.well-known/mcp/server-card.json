@@ -1,0 +1,15 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card/v1.json",
+  "name": "swaraga-mcp",
+  "version": "1.0.0",
+  "description": "Indian Classical Raga Audio Classifier (Hindustani & Carnatic) powered by 12-Swara YIN Pitch Telemetry, TypeSafe System One (Jev), and OpenJev Local WASM",
+  "transport": {
+    "type": "webmcp",
+    "endpoint": "https://h3manth.com/fun/swaraga/"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": false
+  }
+}
