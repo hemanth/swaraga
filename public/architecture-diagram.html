@@ -293,43 +293,55 @@
       </svg>
     </div>
 
-    <div class="cards-grid">
+    <div class="cards-grid" style="grid-template-columns: repeat(2, 1fr);">
       <div class="card">
-        <p class="eyebrow">01 SIGNAL EXTRACTION</p>
+        <p class="eyebrow">01 ACOUSTIC DSP &amp; YIN F0 SCIENCE</p>
         <div class="card-header">
           <span class="card-dot"></span>
-          <h3>Shadja-Locked F0 &amp; Swara Telemetry</h3>
+          <h3>Shadja-Locked F0 &amp; 1200¢ Trajectory</h3>
         </div>
         <ul>
-          <li>Decodes vocal audio at <code>22.05 kHz</code> and locks tonic <code>Sa</code> via harmonic pitch-class saliences or manual override.</li>
-          <li>Runs YIN/NSDF autocorrelation with a 7-point median filter and transient consonant despiker to trace microtonal <code>0–1200¢</code> trajectories.</li>
-          <li>Extracts 12-Swara dwell shares, Vadi/Samvadi candidates, Arohana/Avarohana runs, and top bigram transitions.</li>
+          <li>Decodes vocal audio at <code>16 kHz</code> via Web Audio API and computes the YIN cumulative mean normalized difference function <code>d'(τ) = d(τ) / ((1/τ)∑d(j))</code> with parabolic interpolation.</li>
+          <li>Locks tonic <code>Sa</code> via harmonic fifth/fourth (<code>Pa/Ma</code>) pitch-class salience and maps frames to <code>c = 1200 log₂(f₀ / f_Sa) mod 1200</code>.</li>
+          <li>Applies a 7-point median filter and <code>&gt;350¢</code> transient consonant despiker to segment continuous <em>Svara-Lipi</em> note ribbons.</li>
         </ul>
       </div>
 
       <div class="card">
-        <p class="eyebrow">02 TYPESAFE PRIMITIVES</p>
+        <p class="eyebrow">02 RAGA COMBINATORICS (962 NAMED + 34,848+ OPEN-SET)</p>
         <div class="card-header">
           <span class="card-dot"></span>
-          <h3>10 Batched System One Calls</h3>
+          <h3>Concert Repertoire vs. Mathematical Scales</h3>
         </div>
         <ul>
-          <li><strong>2× <code>choice()</code></strong>: Calibrated probability distributions over 9 parent Thaats and top-6 candidate Ragas.</li>
-          <li><strong>4× <code>score()</code></strong>: Continuous <code>[0,1]</code> rubrics evaluating Arohana/Avarohana adherence, Pakad n-gram fidelity, Gamaka/Meend ornamentation, and Rasa alignment.</li>
-          <li><strong>4× <code>noul()</code></strong>: Ternary <code>yes / no / uncertain</code> verifiers checking Vadi dominance, Varjya swara avoidance, and Carnatic Melakarta equivalence.</li>
+          <li><strong>Concert vs. Compendia</strong>: ~300–500 ragas are actively performed in concerts; classical encyclopedias (<em>Sangita Sampradaya Pradarshini</em>, <em>Raga Nidhi</em>) document ~1,000 named ragas.</li>
+          <li><strong>34,848 Upanga Janya Scales</strong>: Venkatamakhin's <strong>72 Melakartas</strong> × 484 straight 5/6/7-note (<em>Audava / Shadava / Sampurna</em>) Aroha × Avaroha subsets yield <code>72 × 484 = 34,848</code> scales, plus open-ended <em>Vakra</em> &amp; <em>Bhashanga</em> phrasing (<em>"Ananta vai ragah"</em>).</li>
         </ul>
       </div>
 
       <div class="card">
-        <p class="eyebrow">03 DUAL RUNTIME &amp; GATE</p>
+        <p class="eyebrow">03 TWO-STAGE FULL-CATALOG &amp; OPEN-SET MATCHER</p>
         <div class="card-header">
           <span class="card-dot"></span>
-          <h3>Cloud API, OpenJev WASM &amp; Arbiter</h3>
+          <h3>962 Catalogued Ragas + 13th Janya Hypothesis</h3>
         </div>
         <ul>
-          <li><strong>TypeSafe Cloud</strong>: Single batched HTTP call to <code>POST /v1/systemone</code> with BYOK browser key or server <code>.env</code> key.</li>
-          <li><strong>OpenJev Local</strong>: Zero-server in-browser GGUF inference via <code>@wllama/wllama</code> (`Qwen3-0.6B`, `MiniCPM-2B`, `Qwen3.5-4B`).</li>
-          <li><strong>Routing Gate</strong>: Computes <code>√(P(Thaat) × P(Raga))</code> and harmonic mean confidence to emit <code>AUTO_LOCK_RAGA</code> vs <code>CANDIDATE_ENSEMBLE</code>.</li>
+          <li><strong>962 Named Ragas</strong>: Indexes <strong>72</strong> Melakartas, <strong>807</strong> Carnatic Janyas, <strong>61</strong> Hindustani Thaat ragas, and <strong>22</strong> Dual Hindustani–Carnatic pairs.</li>
+          <li><strong>Stage 1 Shortlist</strong>: Scores all 962 ragas via <code>0.42·Recall − 1.15·VarjyaLeak + 0.32·Jaccard + 0.28·Pakad + VadiBonus</code> to forward the top <strong>12</strong> candidates.</li>
+          <li><strong>Stage 2 Open-Set (<code>out_of_catalog</code>)</strong>: Adds a 13th hypothesis that synthesizes the exact Janya Jati, parent Melakarta, and nearest Thaat for any uncatalogued scale.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow">04 SYSTEM ONE PRIMITIVES &amp; DUAL RUNTIME</p>
+        <div class="card-header">
+          <span class="card-dot"></span>
+          <h3>10 Batched Judgments &amp; Zero-Key Browser WASM</h3>
+        </div>
+        <ul>
+          <li><strong>10 Primitives</strong>: 4× <code>choice()</code> (Primary Raga, Parent Thaat, Idiom, Prahar), 2× <code>score()</code> (Gamaka &amp; Rasa 0–3 rubrics), and 4× <code>noul()</code> (Pakad &amp; Vadi verifiers).</li>
+          <li><strong>Hierarchical Beam</strong>: Ranks candidates by geometric beam <code>√(P(Thaat) × P(Raga))</code>.</li>
+          <li><strong>Cloud BYOK or Local WASM</strong>: Evaluates via <code>POST /v1/systemone</code> (<code>jev-latest</code>) or auto-loads OpenJev (<code>@wllama/wllama</code> <code>Qwen3-0.6B</code>) in-browser when no API key is present.</li>
         </ul>
       </div>
     </div>

@@ -26,7 +26,7 @@
   <link rel="describedby" href="./.well-known/mcp/server-card.json" type="application/json" />
   <link rel="describedby" href="./.well-known/agent-card.json" type="application/json" />
   <link rel="describedby" href="./llms.txt" type="text/plain" />
-  <link rel="stylesheet" href="./styles.css?v=3" />
+  <link rel="stylesheet" href="./styles.css?v=4" />
 </head>
 <body>
   <!-- Subtle Top Utility Bar -->
@@ -115,16 +115,16 @@
     <div class="top-drawer" id="drawer-arch" hidden>
       <div class="drawer-inner">
         <div class="drawer-header">
-          <span class="drawer-title">HOW IT WORKS · SYSTEM ARCHITECTURE &amp; SIGNAL TOPOLOGY</span>
+          <span class="drawer-title">HOW IT WORKS · ACOUSTIC DSP SCIENCE, RAGA COMBINATORICS &amp; SYSTEM ONE</span>
           <div style="display:flex; gap:10px; align-items:center;">
             <a href="./architecture-diagram.html" target="_blank" rel="noopener" class="openjev-link-badge">
-              Open Fullscreen Diagram ↗
+              Open Fullscreen Blueprint ↗
             </a>
             <button type="button" class="drawer-close" id="btn-close-arch">Close</button>
           </div>
         </div>
         <p class="arch-intro">
-          Swaraga decouples <strong>deterministic acoustic signal processing</strong> (16 kHz Web Audio decode, Shadja tonic lock, despiked YIN F0 tracking, 12-Swara cent dwell histograms, and Arohana/Avarohana n-grams) from <strong>probabilistic musicological reasoning</strong> (10 parallel TypeSafe System One <code>choice</code>, <code>score</code>, and <code>noul</code> primitives).
+          Swaraga combines <strong>16 kHz microtonal pitch DSP</strong> with <strong>962 catalogued ragas + open-set Melakarta/Janya combinatorics</strong> and <strong>10 parallel TypeSafe System One (<code>choice</code>, <code>score</code>, <code>noul</code>) primitives</strong>. When no API key is present, it automatically loads <code>Qwen3-0.6B</code> in-browser via WebAssembly for 1-token direct logit readouts.
         </p>
         <div class="arch-blueprint-frame">
           <svg
@@ -171,8 +171,8 @@
               <rect x="52" y="340" width="284" height="96" rx="8" fill="#ffffff" stroke="#111111" stroke-width="1.2" />
               <rect x="66" y="352" width="84" height="18" rx="2" fill="none" stroke="#111111" stroke-width="1" />
               <text x="108" y="364" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" letter-spacing="1" fill="#111111">TELEMETRY</text>
-              <text x="194" y="388" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">12-Swara &amp; Phrase Profiler</text>
-              <text x="194" y="410" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">1200¢ Histogram · Arohana N-Grams</text>
+              <text x="194" y="388" text-anchor="middle" font-family="'Inter', sans-serif" font-size="14" font-weight="600" fill="#111111">962-Raga &amp; Open-Set Matcher</text>
+              <text x="194" y="410" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="10.5" fill="#52525b">1200¢ Histogram · Top-12 + Janya</text>
             </g>
             <g>
               <rect x="438" y="112" width="284" height="114" rx="8" fill="#111111" stroke="#111111" stroke-width="1.5" />
@@ -232,6 +232,41 @@
             <rect x="538" y="274" width="84" height="16" fill="#ffffff" />
             <text x="580" y="285" text-anchor="middle" font-family="'Geist Mono', monospace" font-size="8.5" font-weight="600" fill="#111111">GRAMMAR FIT</text>
           </svg>
+        </div>
+
+        <!-- Science & Combinatorics 4-Card Breakdown -->
+        <div class="arch-science-grid">
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">01</span> ACOUSTIC DSP &amp; YIN F0 SCIENCE</div>
+            <h3>Shadja Lock &amp; 1200¢ Microtonal Tracking</h3>
+            <p>
+              Decodes vocal audio at <code>16 kHz</code> via Web Audio API and estimates fundamental frequency <code>F0</code> using the YIN cumulative mean normalized difference function <code>d'(τ) = d(τ) / ((1/τ)∑d(j))</code> with parabolic interpolation. Locks tonic <strong>Shadja (Sa)</strong> via fifth/fourth (<code>Pa/Ma</code>) harmonic salience and maps every frame to <code>c = 1200 log₂(f₀ / f_Sa) mod 1200</code>, smoothed with a 7-point median filter and a <code>&gt;350¢</code> consonant plosive despiker.
+            </p>
+          </div>
+
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">02</span> RAGA COMBINATORICS (962 + 34,848+)</div>
+            <h3>Why 962 Named Ragas + Open-Set Synthesis?</h3>
+            <p>
+              Roughly <strong>300–500 ragas</strong> are actively performed in Hindustani and Carnatic concerts, while classical compendia (<em>Sangita Sampradaya Pradarshini</em>, <em>Raga Nidhi</em>) document ~1,000 named ragas. Mathematically, Venkatamakhin's <strong>72 Melakartas</strong> × 484 straight 5/6/7-note (<em>Audava / Shadava / Sampurna</em>) Aroha × Avaroha subsets yield <strong>34,848 Upanga Janya scales</strong>—plus infinite <em>Vakra</em> and <em>Bhashanga</em> phrasing (<em>"Ananta vai ragah"</em>).
+            </p>
+          </div>
+
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">03</span> TWO-STAGE FULL-CATALOG MATCHER</div>
+            <h3>962-Raga Lexicon + 13th Open-Set Hypothesis</h3>
+            <p>
+              Swaraga indexes <strong>962 named ragas</strong> (<strong>72</strong> Melakartas, <strong>807</strong> Carnatic Janyas, <strong>61</strong> Hindustani Thaat ragas, and <strong>22</strong> Dual Hindustani–Carnatic pairs). Stage 1 scores all 962 ragas via <code>0.42·Recall − 1.15·VarjyaLeak + 0.32·Jaccard + 0.28·Pakad + VadiBonus</code> to shortlist the top <strong>12</strong> candidates, plus a 13th <code>out_of_catalog</code> hypothesis that synthesizes the exact Janya Jati, parent Melakarta, and nearest Thaat for any unlisted scale.
+            </p>
+          </div>
+
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">04</span> SYSTEM ONE &amp; ZERO-KEY WASM</div>
+            <h3>10 Typed Primitives &amp; Hierarchical Beam</h3>
+            <p>
+              Compiles extracted swara telemetry into 10 batched System One primitives: 4× <code>choice()</code> (Primary Raga, Parent Thaat, Idiom, Prahar), 2× <code>score()</code> (Gamaka &amp; Rasa 0–3 rubrics), and 4× <code>noul()</code> (Pakad &amp; Vadi verifiers). Candidates are ranked by geometric beam <code>√(P(Thaat) × P(Raga))</code> via TypeSafe Cloud (<code>jev-latest</code>) or in-browser OpenJev (<code>@wllama/wllama</code> <code>Qwen3-0.6B</code> 1-token direct option logit readout).
+            </p>
+          </div>
         </div>
       </div>
     </div>
