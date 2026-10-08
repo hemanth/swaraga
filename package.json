@@ -8,6 +8,7 @@
     "start": "node server.mjs",
     "dev": "node --watch server.mjs",
     "generate-samples": "python3 scripts/generate-sample-mp3s.py",
+    "bench": "node bench/run-eval.mjs",
     "test": "node --test test/*.test.js"
   },
   "keywords": [
@@ -26,5 +27,8 @@
   "license": "MIT",
   "dependencies": {
     "@typesafe-ai/sdk": "^0.6.0"
+  },
+  "optionalDependencies": {
+    "@huggingface/transformers": "^4.3.1"
   }
 }

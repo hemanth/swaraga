@@ -238,10 +238,14 @@ async function applyOpenJevToClassification(data) {
   return data;
 }
 
-// Top Utility Drawers (Engine / BYOK / OpenJev & How It Works Architecture)
+// Top Utility Drawers (Engine / BYOK / OpenJev, Eval & Science, & How It Works Architecture)
 const btnToggleEngine = document.getElementById('btn-toggle-engine');
 const btnCloseEngine = document.getElementById('btn-close-engine');
 const drawerEngine = document.getElementById('drawer-engine');
+
+const btnToggleEval = document.getElementById('btn-toggle-eval');
+const btnCloseEval = document.getElementById('btn-close-eval');
+const drawerEval = document.getElementById('drawer-eval');
 
 const btnToggleArch = document.getElementById('btn-toggle-arch');
 const btnCloseArch = document.getElementById('btn-close-arch');
@@ -250,15 +254,25 @@ const drawerArch = document.getElementById('drawer-arch');
 const btnToggleYt = document.getElementById('btn-toggle-yt');
 const youtubeFetchRow = document.getElementById('youtube-fetch-row');
 
+function closeAllDrawersExcept(keepDrawer) {
+  for (const [dr, btn] of [
+    [drawerEngine, btnToggleEngine],
+    [drawerEval, btnToggleEval],
+    [drawerArch, btnToggleArch]
+  ]) {
+    if (dr && dr !== keepDrawer) {
+      dr.hidden = true;
+      btn?.setAttribute('aria-expanded', 'false');
+    }
+  }
+}
+
 if (btnToggleEngine && drawerEngine) {
   btnToggleEngine.addEventListener('click', () => {
     const willOpen = drawerEngine.hidden;
+    closeAllDrawersExcept(drawerEngine);
     drawerEngine.hidden = !willOpen;
     btnToggleEngine.setAttribute('aria-expanded', String(willOpen));
-    if (willOpen && drawerArch) {
-      drawerArch.hidden = true;
-      btnToggleArch?.setAttribute('aria-expanded', 'false');
-    }
   });
 }
 if (btnCloseEngine && drawerEngine) {
@@ -268,15 +282,27 @@ if (btnCloseEngine && drawerEngine) {
   });
 }
 
+if (btnToggleEval && drawerEval) {
+  btnToggleEval.addEventListener('click', () => {
+    const willOpen = drawerEval.hidden;
+    closeAllDrawersExcept(drawerEval);
+    drawerEval.hidden = !willOpen;
+    btnToggleEval.setAttribute('aria-expanded', String(willOpen));
+  });
+}
+if (btnCloseEval && drawerEval) {
+  btnCloseEval.addEventListener('click', () => {
+    drawerEval.hidden = true;
+    btnToggleEval?.setAttribute('aria-expanded', 'false');
+  });
+}
+
 if (btnToggleArch && drawerArch) {
   btnToggleArch.addEventListener('click', () => {
     const willOpen = drawerArch.hidden;
+    closeAllDrawersExcept(drawerArch);
     drawerArch.hidden = !willOpen;
     btnToggleArch.setAttribute('aria-expanded', String(willOpen));
-    if (willOpen && drawerEngine) {
-      drawerEngine.hidden = true;
-      btnToggleEngine?.setAttribute('aria-expanded', 'false');
-    }
   });
 }
 if (btnCloseArch && drawerArch) {
@@ -285,6 +311,157 @@ if (btnCloseArch && drawerArch) {
     btnToggleArch?.setAttribute('aria-expanded', 'false');
   });
 }
+
+let evalBenchmarkData = null;
+let activeEvalSlice = 'all';
+let activeProbeId = 'yaman';
+
+function renderEvalMatrixTable() {
+  const tbody = document.getElementById('eval-matrix-tbody');
+  if (!tbody || !evalBenchmarkData?.engines) return;
+
+  tbody.innerHTML = evalBenchmarkData.engines
+    .map((eng, idx) => {
+      const isWinner = idx === 0;
+      const isMrlRow = eng.id.startsWith('eg2_dsp_text_');
+      const isDimmed = activeEvalSlice === 'mrl' && !isMrlRow && idx > 1;
+      const delta = eng.slices.tonicDropDelta;
+      const deltaStr = `${delta >= 0 ? '+' : ''}${delta}%`;
+      const deltaColor = delta <= -20 ? '#f87171' : delta <= -8 ? '#fbbf24' : '#34d399';
+
+      return `
+        <tr class="${isWinner ? 'eval-row-winner' : ''} ${isDimmed ? 'eval-row-dimmed' : ''}">
+          <td>
+            <div style="font-weight:600; color:#fff;">${eng.name}</div>
+            <div class="mono-label" style="font-size:0.71rem;">${eng.family} · ${eng.dim}d</div>
+          </td>
+          <td>
+            <div class="mono-value" style="font-size:0.75rem;">${eng.params}</div>
+            <div class="mono-label" style="font-size:0.7rem;">${eng.modality}</div>
+          </td>
+          <td class="${activeEvalSlice === 'all' || activeEvalSlice === 'mrl' ? 'eval-col-focus' : ''}">
+            <div class="eval-bar-cell">
+              <div style="display:flex; justify-content:space-between; font-family:var(--font-mono);">
+                <strong>${eng.top1Accuracy14}%</strong>
+                <span class="mono-label" style="font-size:0.7rem;">[${eng.ci95[0]}–${eng.ci95[1]}%]</span>
+              </div>
+              <div class="eval-bar-track">
+                <div class="eval-bar-fill" style="width:${Math.max(4, eng.top1Accuracy14)}%;"></div>
+              </div>
+            </div>
+          </td>
+          <td class="${activeEvalSlice === 'mrl' ? 'eval-col-focus' : ''}" style="font-family:var(--font-mono);">
+            ${eng.top3Recall14}%
+          </td>
+          <td style="font-family:var(--font-mono);">
+            <strong>${eng.top1Accuracy962}%</strong> <span class="mono-label">/ ${eng.top5Recall962}%</span>
+          </td>
+          <td style="font-family:var(--font-mono);">${eng.macroF1}%</td>
+          <td class="${activeEvalSlice === 'tonic' ? 'eval-col-focus' : ''}" style="font-family:var(--font-mono);">
+            ${eng.slices.canonicalTonic}%
+          </td>
+          <td class="${activeEvalSlice === 'tonic' ? 'eval-col-focus' : ''}" style="font-family:var(--font-mono);">
+            ${eng.slices.transposedTonic}% <span style="color:${deltaColor}; font-size:0.74rem;">(${deltaStr})</span>
+          </td>
+          <td class="${activeEvalSlice === 'sibling' ? 'eval-col-focus' : ''}" style="font-family:var(--font-mono);">
+            <strong>${eng.slices.siblingPairs}%</strong>
+          </td>
+          <td style="font-family:var(--font-mono); white-space:nowrap;">
+            ${eng.latency.p50Ms} ms <span class="mono-label" style="font-size:0.69rem;">(p95 ${Math.round(eng.latency.p95Ms)})</span>
+          </td>
+        </tr>
+      `;
+    })
+    .join('');
+}
+
+function renderEvalProbeStage(probeId = activeProbeId) {
+  activeProbeId = probeId;
+  const stage = document.getElementById('eval-probe-stage');
+  const probe = evalBenchmarkData?.sampleProbes?.[probeId];
+  if (!stage || !probe) return;
+
+  document.querySelectorAll('#eval-probe-pills [data-probe-id]').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-probe-id') === probeId);
+  });
+
+  const renderTopList = (items = [], metricLabel = 'cos') =>
+    items
+      .map((item, i) => {
+        const isHit = item.id === probe.id;
+        const cls = i === 0 ? (isHit ? 'hit' : 'miss') : isHit ? 'hit' : '';
+        return `
+          <div class="eval-probe-rank ${cls}">
+            <span>#${i + 1} ${item.name.replace('Raga ', '')}</span>
+            <span>${metricLabel}=${Number(item.score).toFixed(4)}</span>
+          </div>
+        `;
+      })
+      .join('');
+
+  stage.innerHTML = `
+    <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:8px 12px; background:rgba(255,255,255,0.03); border-radius:6px; border:1px solid var(--card-border);">
+      <span class="mono-value">Ground Truth: <strong>${probe.label}</strong></span>
+      <span class="mono-label">YIN Tonic: <strong>${probe.detectedTonic}</strong> · Swaras: <strong>${probe.activeSwaras}</strong> · Vadi: <strong>${probe.detectedVadi}</strong></span>
+    </div>
+    <div class="mono-label" style="margin-top:8px; font-size:0.72rem; word-break:break-word; opacity:0.85;">
+      <strong>EmbeddingGemma 2 Asymmetric Query:</strong> <code>${probe.queryText}</code>
+    </div>
+    <div class="eval-probe-grid">
+      <div class="eval-probe-col">
+        <div class="mono-label">1. SWARAGA (YIN + SYSTEM ONE)</div>
+        ${renderTopList(probe.systemOneTop3, 'P')}
+      </div>
+      <div class="eval-probe-col">
+        <div class="mono-label">2. EMBEDDINGGEMMA 2 HYBRID (768d)</div>
+        ${renderTopList(probe.eg2Hybrid768Top3, 'cos')}
+      </div>
+      <div class="eval-probe-col">
+        <div class="mono-label">3. EMBEDDINGGEMMA 2 MRL (128d)</div>
+        ${renderTopList(probe.eg2Hybrid128Top3, 'cos')}
+      </div>
+      <div class="eval-probe-col">
+        <div class="mono-label">4. EG2 ZERO-SHOT (AUDIO→TEXT)</div>
+        ${renderTopList(probe.eg2ZeroShotTop3, 'cos')}
+      </div>
+    </div>
+  `;
+}
+
+async function initEvalScienceTab() {
+  try {
+    const res = await fetch('./eval-results.json');
+    if (res.ok) {
+      evalBenchmarkData = await res.json();
+      renderEvalMatrixTable();
+      renderEvalProbeStage(activeProbeId);
+    }
+  } catch (err) {
+    console.warn('Could not load eval-results.json:', err);
+  }
+
+  document.querySelectorAll('.eval-slice-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeEvalSlice = btn.getAttribute('data-eval-slice') || 'all';
+      document.querySelectorAll('.eval-slice-btn').forEach((b) => b.classList.toggle('active', b === btn));
+      renderEvalMatrixTable();
+    });
+  });
+
+  document.querySelectorAll('#eval-probe-pills [data-probe-id]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      renderEvalProbeStage(btn.getAttribute('data-probe-id'));
+    });
+  });
+
+  const urlTab = new URLSearchParams(window.location.search).get('tab');
+  if (urlTab === 'eval' && drawerEval) {
+    closeAllDrawersExcept(drawerEval);
+    drawerEval.hidden = false;
+    btnToggleEval?.setAttribute('aria-expanded', 'true');
+  }
+}
+initEvalScienceTab();
 
 if (btnToggleYt && youtubeFetchRow) {
   btnToggleYt.addEventListener('click', () => {

@@ -106,6 +106,22 @@ npm start
 
 Starts the Swaraga web studio on `http://localhost:3480` with progressive scroll-animated cards, live microphone capture, BYOK / OpenJev switching, and interactive F0 cent-trajectory scrubbing.
 
+## Benchmarks (N = 46 clips, Apple M5 arm64)
+
+Reproduce via `npm run bench` (`bench/run-eval.mjs` against `onnx-community/embeddinggemma-2-ONNX` 570M Text+Audio `q4`):
+
+| Engine | Top-1 (14) | Top-3 (14) | Top-1 (962) | Canonical Sa | Shifted Sa (+600¢) | Sibling Pairs | Latency (p50) |
+|---|---|---|---|---|---|---|---|
+| Swaraga Full (YIN F0 + TypeSafe System One) | 93.5% | 93.5% | 84.8% | 100.0% | 88.5% | 93.3% | 367.5 ms |
+| Swaraga Stage 1 (YIN F0 + 962 Lakshanam) | 93.5% | 93.5% | 82.6% | 100.0% | 88.5% | 93.3% | 182.8 ms |
+| EmbeddingGemma 2 Audio k-NN (300M, Raw) | 58.7% | 69.6% | 58.7% | 75.0% | 46.2% | 53.3% | 2087.1 ms |
+| EmbeddingGemma 2 Hybrid (YIN -> Text 768d) | 47.8% | 73.9% | 17.4% | 50.0% | 46.2% | 40.0% | 624.0 ms |
+| EmbeddingGemma 2 Hybrid (YIN -> MRL 512d) | 47.8% | 73.9% | 8.7% | 50.0% | 46.2% | 40.0% | 627.9 ms |
+| EmbeddingGemma 2 Hybrid (YIN -> MRL 256d) | 37.0% | 67.4% | 13.0% | 40.0% | 34.6% | 53.3% | 624.2 ms |
+| EmbeddingGemma 2 Zero-Shot (Audio -> Text) | 6.5% | 15.2% | 0.0% | 10.0% | 3.8% | 13.3% | 2087.1 ms |
+
+Interactive playground & evaluation tab: [h3manth.com/fun/swaraga/?tab=eval](https://h3manth.com/fun/swaraga/?tab=eval)
+
 ## Related
 
 - [TypeSafe AI](https://typesafe.ai) — System One primitives (`choice`, `score`, `noul`)

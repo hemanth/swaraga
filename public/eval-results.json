@@ -1,0 +1,1002 @@
+{
+  "generatedAt": "2026-10-08T14:39:12.353Z",
+  "hardware": {
+    "cpu": "Apple M5",
+    "arch": "arm64",
+    "cores": 10,
+    "runtime": "Node.js v26.8.1 + ONNX Runtime + @huggingface/transformers"
+  },
+  "embeddingGemma2Model": {
+    "modelId": "onnx-community/embeddinggemma-2-ONNX",
+    "architecture": "Gemma 4 Multimodal Bi-Encoder (Selective 570M: 270M Text + 300M Audio, q4)",
+    "matryoshkaDims": [
+      768,
+      512,
+      256,
+      128
+    ],
+    "catalogIndexSize": 962,
+    "catalogEmbedTimeMs": 546962.4,
+    "modelLoadTimeMs": 1280.2
+  },
+  "datasetSummary": {
+    "totalClips": 46,
+    "humanVocalClips": 18,
+    "harmonicSynthClips": 28,
+    "canonicalTonicClips": 20,
+    "transposedTonicClips": 26,
+    "siblingPairClips": 15,
+    "targetRagasCount": 14,
+    "fullCatalogCount": 962
+  },
+  "engines": [
+    {
+      "id": "yin_typesafe_system_one",
+      "name": "Swaraga Full Pipeline (YIN F0 + TypeSafe System One)",
+      "family": "DSP + System One",
+      "modality": "PCM -> YIN F0 -> 962-Prune -> Jev System One",
+      "dim": 12,
+      "params": "0.6B (Jev)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 93.5,
+      "top3Recall14": 93.5,
+      "top5Recall14": 93.5,
+      "top1Accuracy962": 84.8,
+      "top5Recall962": 93.5,
+      "macroF1": 95.6,
+      "mrr": 0.935,
+      "ci95": [
+        87,
+        100
+      ],
+      "slices": {
+        "canonicalTonic": 100,
+        "transposedTonic": 88.5,
+        "tonicDropDelta": -11.5,
+        "humanVocal": 83.3,
+        "siblingPairs": 93.3
+      },
+      "latency": {
+        "meanMs": 396.33,
+        "p50Ms": 367.49,
+        "p95Ms": 632.69,
+        "p99Ms": 785.42
+      }
+    },
+    {
+      "id": "yin_lakshanam_962",
+      "name": "Swaraga Stage 1 (YIN F0 + 962-Raga Lakshanam Matcher)",
+      "family": "Deterministic DSP",
+      "modality": "PCM -> YIN F0 -> Swara/Varjya/Pakad/Vadi Grammar",
+      "dim": 12,
+      "params": "0 (Pure Math)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 93.5,
+      "top3Recall14": 93.5,
+      "top5Recall14": 93.5,
+      "top1Accuracy962": 82.6,
+      "top5Recall962": 89.1,
+      "macroF1": 95.6,
+      "mrr": 0.935,
+      "ci95": [
+        87,
+        100
+      ],
+      "slices": {
+        "canonicalTonic": 100,
+        "transposedTonic": 88.5,
+        "tonicDropDelta": -11.5,
+        "humanVocal": 83.3,
+        "siblingPairs": 93.3
+      },
+      "latency": {
+        "meanMs": 197.25,
+        "p50Ms": 182.81,
+        "p95Ms": 334.42,
+        "p99Ms": 443.95
+      }
+    },
+    {
+      "id": "eg2_dsp_text_768d",
+      "name": "EmbeddingGemma 2 Hybrid (YIN DSP -> Text Bi-Encoder 768d)",
+      "family": "EmbeddingGemma 2 (Hybrid)",
+      "modality": "YIN Telemetry Query -> EmbeddingGemma 2 Text (768d)",
+      "dim": 768,
+      "params": "270M Text (q4)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 47.8,
+      "top3Recall14": 73.9,
+      "top5Recall14": 73.9,
+      "top1Accuracy962": 17.4,
+      "top5Recall962": 37,
+      "macroF1": 39.7,
+      "mrr": 0.628,
+      "ci95": [
+        32.6,
+        63
+      ],
+      "slices": {
+        "canonicalTonic": 50,
+        "transposedTonic": 46.2,
+        "tonicDropDelta": -3.8,
+        "humanVocal": 55.6,
+        "siblingPairs": 40
+      },
+      "latency": {
+        "meanMs": 724.85,
+        "p50Ms": 624.03,
+        "p95Ms": 1356.96,
+        "p99Ms": 1818.68
+      }
+    },
+    {
+      "id": "eg2_dsp_text_512d",
+      "name": "EmbeddingGemma 2 Hybrid (YIN DSP -> Text MRL 512d)",
+      "family": "EmbeddingGemma 2 (Hybrid MRL)",
+      "modality": "YIN Telemetry Query -> EmbeddingGemma 2 MRL (512d)",
+      "dim": 512,
+      "params": "270M Text (q4)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 47.8,
+      "top3Recall14": 73.9,
+      "top5Recall14": 73.9,
+      "top1Accuracy962": 8.7,
+      "top5Recall962": 37,
+      "macroF1": 39.7,
+      "mrr": 0.626,
+      "ci95": [
+        32.6,
+        63
+      ],
+      "slices": {
+        "canonicalTonic": 50,
+        "transposedTonic": 46.2,
+        "tonicDropDelta": -3.8,
+        "humanVocal": 55.6,
+        "siblingPairs": 40
+      },
+      "latency": {
+        "meanMs": 726,
+        "p50Ms": 627.88,
+        "p95Ms": 1357.29,
+        "p99Ms": 1829.39
+      }
+    },
+    {
+      "id": "eg2_dsp_text_256d",
+      "name": "EmbeddingGemma 2 Hybrid (YIN DSP -> Text MRL 256d)",
+      "family": "EmbeddingGemma 2 (Hybrid MRL)",
+      "modality": "YIN Telemetry Query -> EmbeddingGemma 2 MRL (256d)",
+      "dim": 256,
+      "params": "270M Text (q4)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 37,
+      "top3Recall14": 67.4,
+      "top5Recall14": 73.9,
+      "top1Accuracy962": 13,
+      "top5Recall962": 37,
+      "macroF1": 30.4,
+      "mrr": 0.541,
+      "ci95": [
+        23.9,
+        50
+      ],
+      "slices": {
+        "canonicalTonic": 40,
+        "transposedTonic": 34.6,
+        "tonicDropDelta": -5.4,
+        "humanVocal": 27.8,
+        "siblingPairs": 53.3
+      },
+      "latency": {
+        "meanMs": 723.86,
+        "p50Ms": 624.24,
+        "p95Ms": 1358.71,
+        "p99Ms": 1822.89
+      }
+    },
+    {
+      "id": "eg2_dsp_text_128d",
+      "name": "EmbeddingGemma 2 Hybrid (YIN DSP -> Text MRL 128d)",
+      "family": "EmbeddingGemma 2 (Hybrid MRL)",
+      "modality": "YIN Telemetry Query -> EmbeddingGemma 2 MRL (128d)",
+      "dim": 128,
+      "params": "270M Text (q4)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 34.8,
+      "top3Recall14": 56.5,
+      "top5Recall14": 76.1,
+      "top1Accuracy962": 8.7,
+      "top5Recall962": 26.1,
+      "macroF1": 32.4,
+      "mrr": 0.51,
+      "ci95": [
+        21.7,
+        47.8
+      ],
+      "slices": {
+        "canonicalTonic": 40,
+        "transposedTonic": 30.8,
+        "tonicDropDelta": -9.2,
+        "humanVocal": 33.3,
+        "siblingPairs": 53.3
+      },
+      "latency": {
+        "meanMs": 724.81,
+        "p50Ms": 625.52,
+        "p95Ms": 1356.15,
+        "p99Ms": 1823.72
+      }
+    },
+    {
+      "id": "eg2_audio_proto_sa_norm",
+      "name": "EmbeddingGemma 2 Audio k-NN (YIN Tonic-Normalized Audio 768d)",
+      "family": "EmbeddingGemma 2 (Tonic-Normalized Audio)",
+      "modality": "YIN Sa-Shift -> Gemma4AudioFeatureExtractor -> 768d k-NN",
+      "dim": 768,
+      "params": "300M Audio (q4)",
+      "catalogSize": 14,
+      "sampleSize": 46,
+      "top1Accuracy14": 54.3,
+      "top3Recall14": 71.7,
+      "top5Recall14": 78.3,
+      "top1Accuracy962": 54.3,
+      "top5Recall962": 78.3,
+      "macroF1": 55.8,
+      "mrr": 0.658,
+      "ci95": [
+        41.3,
+        67.4
+      ],
+      "slices": {
+        "canonicalTonic": 75,
+        "transposedTonic": 38.5,
+        "tonicDropDelta": -36.5,
+        "humanVocal": 83.3,
+        "siblingPairs": 53.3
+      },
+      "latency": {
+        "meanMs": 2119.3,
+        "p50Ms": 1961.03,
+        "p95Ms": 3120.3,
+        "p99Ms": 4506.22
+      }
+    },
+    {
+      "id": "eg2_audio_proto_raw",
+      "name": "EmbeddingGemma 2 Audio k-NN (Raw Un-Normalized Audio 768d)",
+      "family": "EmbeddingGemma 2 (Raw Audio)",
+      "modality": "Raw 16kHz PCM -> Gemma4AudioFeatureExtractor -> 768d k-NN",
+      "dim": 768,
+      "params": "300M Audio (q4)",
+      "catalogSize": 14,
+      "sampleSize": 46,
+      "top1Accuracy14": 58.7,
+      "top3Recall14": 69.6,
+      "top5Recall14": 82.6,
+      "top1Accuracy962": 58.7,
+      "top5Recall962": 82.6,
+      "macroF1": 58.1,
+      "mrr": 0.685,
+      "ci95": [
+        45.7,
+        71.7
+      ],
+      "slices": {
+        "canonicalTonic": 75,
+        "transposedTonic": 46.2,
+        "tonicDropDelta": -28.8,
+        "humanVocal": 94.4,
+        "siblingPairs": 53.3
+      },
+      "latency": {
+        "meanMs": 2275.32,
+        "p50Ms": 2087.09,
+        "p95Ms": 3411.52,
+        "p99Ms": 5312.57
+      }
+    },
+    {
+      "id": "eg2_audio_text_zeroshot",
+      "name": "EmbeddingGemma 2 Zero-Shot Cross-Modal (Raw Audio -> Text 768d)",
+      "family": "EmbeddingGemma 2 (Cross-Modal Zero-Shot)",
+      "modality": "Raw 16kHz Audio Vec <-> Raga Text Vec Cosine (768d)",
+      "dim": 768,
+      "params": "570M Audio+Text (q4)",
+      "catalogSize": 962,
+      "sampleSize": 46,
+      "top1Accuracy14": 6.5,
+      "top3Recall14": 15.2,
+      "top5Recall14": 34.8,
+      "top1Accuracy962": 0,
+      "top5Recall962": 0,
+      "macroF1": 2,
+      "mrr": 0.225,
+      "ci95": [
+        0,
+        15.2
+      ],
+      "slices": {
+        "canonicalTonic": 10,
+        "transposedTonic": 3.8,
+        "tonicDropDelta": -6.2,
+        "humanVocal": 0,
+        "siblingPairs": 13.3
+      },
+      "latency": {
+        "meanMs": 2275.32,
+        "p50Ms": 2087.09,
+        "p95Ms": 3411.52,
+        "p99Ms": 5312.57
+      }
+    }
+  ],
+  "sampleProbes": {
+    "yaman": {
+      "id": "yaman",
+      "label": "Raga Yaman (Vocal C#3)",
+      "detectedTonic": "C# (138.59 Hz)",
+      "activeSwaras": "S R2 G3 M2 P D2 N3",
+      "detectedVadi": "G3 / R2",
+      "queryText": "task: search result | query: Kalyan thaat, Sampurna (7-note Heptatonic) scale (7 notes: S R2 G3 M2 P D2 N3). Teevra Madhyam (M2). All Shuddha swaras (no komal notes). Active swaras: Shadja (Sa) [S], Shuddha Rishabh (Re) [R2], Shuddha Gandhar (Ga) [G3], Teevra Madhyam (Ma#) [M2], Pancham (Pa) [P], Shuddha Dhaivat (Dha) [D2], Shuddha Nishad (Ni) [N3]. Omissions: ; excluded chromatic swaras: r1 g2 M1 d1 n2. Vadi principal swara: Shuddha Gandhar (Ga) [G3], Samvadi consonant swara: Shuddha Rishabh (Re) [R2]. Aroha ascending: S R2 G3 M2 P D2 N3. Avaroha descending: N3 D2 P M2 G3 R2 S. Pakad catch phrases: N3 R2 G3, R2 G3 M2, G3 M2 P, M2 P D2, P D2 N3, P R2 G3, G3 R2 S",
+      "systemOneTop3": [
+        {
+          "id": "yaman",
+          "name": "Raga Yaman",
+          "score": 0.96
+        },
+        {
+          "id": "mechakalyani",
+          "name": "Raga Mechakalyani",
+          "score": 0.03
+        },
+        {
+          "id": "yaman_kalyan",
+          "name": "Raga Yaman Kalyan",
+          "score": 0.01
+        }
+      ],
+      "stage1Top3": [
+        {
+          "id": "yaman",
+          "name": "Raga Yaman",
+          "score": 0.99
+        },
+        {
+          "id": "yaman_kalyan",
+          "name": "Raga Yaman Kalyan",
+          "score": 0.99
+        },
+        {
+          "id": "maru_bihag",
+          "name": "Raga Maru Bihag",
+          "score": 0.99
+        }
+      ],
+      "eg2Hybrid768Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.8516
+        },
+        {
+          "id": "yaman",
+          "name": "Raga Yaman",
+          "score": 0.8487
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.833
+        }
+      ],
+      "eg2Hybrid256Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.8573
+        },
+        {
+          "id": "yaman",
+          "name": "Raga Yaman",
+          "score": 0.8551
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.8417
+        }
+      ],
+      "eg2Hybrid128Top3": [
+        {
+          "id": "yaman",
+          "name": "Raga Yaman",
+          "score": 0.9008
+        },
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.8963
+        },
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.8826
+        }
+      ],
+      "eg2ZeroShotTop3": [
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.6341
+        },
+        {
+          "id": "bageshri",
+          "name": "Raga Bageshri",
+          "score": 0.6224
+        },
+        {
+          "id": "deshkar",
+          "name": "Raga Deshkar",
+          "score": 0.6194
+        }
+      ]
+    },
+    "bhairav": {
+      "id": "bhairav",
+      "label": "Raga Bhairav (Vocal G#3)",
+      "detectedTonic": "G# (207.65 Hz)",
+      "activeSwaras": "S r1 G3 M1 P d1 N3",
+      "detectedVadi": "r1 / N3",
+      "queryText": "task: search result | query: Bhairav thaat, Sampurna (7-note Heptatonic) scale (7 notes: S r1 G3 M1 P d1 N3). Shuddha Madhyam (M1). Komal swaras: Komal Rishabh (re) [r1], Komal Dhaivat (dha) [d1]. Active swaras: Shadja (Sa) [S], Komal Rishabh (re) [r1], Shuddha Gandhar (Ga) [G3], Shuddha Madhyam (Ma) [M1], Pancham (Pa) [P], Komal Dhaivat (dha) [d1], Shuddha Nishad (Ni) [N3]. Omissions: ; excluded chromatic swaras: R2 g2 M2 D2 n2. Vadi principal swara: Komal Rishabh (re) [r1], Samvadi consonant swara: Shuddha Nishad (Ni) [N3]. Aroha ascending: S r1 G3 M1 P d1 N3. Avaroha descending: N3 d1 P M1 G3 r1 S. Pakad catch phrases: S r1 G3, r1 G3 M1, G3 M1 P, M1 P d1, M1 G3 r1, G3 r1 S",
+      "systemOneTop3": [
+        {
+          "id": "bhairav",
+          "name": "Raga Bhairav",
+          "score": 0.93
+        },
+        {
+          "id": "kalingda",
+          "name": "Raga Kalingda",
+          "score": 0.02
+        },
+        {
+          "id": "mayamalavagowla",
+          "name": "Raga Mayamalavagowla",
+          "score": 0.02
+        }
+      ],
+      "stage1Top3": [
+        {
+          "id": "bhairav",
+          "name": "Raga Bhairav",
+          "score": 0.903
+        },
+        {
+          "id": "maruva",
+          "name": "Raga Maruva",
+          "score": 0.899
+        },
+        {
+          "id": "kalingda",
+          "name": "Raga Kalingda",
+          "score": 0.88
+        }
+      ],
+      "eg2Hybrid768Top3": [
+        {
+          "id": "bhairav",
+          "name": "Raga Bhairav",
+          "score": 0.9012
+        },
+        {
+          "id": "bhairavi",
+          "name": "Raga Bhairavi",
+          "score": 0.8818
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8495
+        }
+      ],
+      "eg2Hybrid256Top3": [
+        {
+          "id": "bhairav",
+          "name": "Raga Bhairav",
+          "score": 0.905
+        },
+        {
+          "id": "bhairavi",
+          "name": "Raga Bhairavi",
+          "score": 0.8921
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8489
+        }
+      ],
+      "eg2Hybrid128Top3": [
+        {
+          "id": "bhairav",
+          "name": "Raga Bhairav",
+          "score": 0.9286
+        },
+        {
+          "id": "bhairavi",
+          "name": "Raga Bhairavi",
+          "score": 0.919
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8993
+        }
+      ],
+      "eg2ZeroShotTop3": [
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.6779
+        },
+        {
+          "id": "bhimpalasi",
+          "name": "Raga Bhimpalasi",
+          "score": 0.6641
+        },
+        {
+          "id": "bageshri",
+          "name": "Raga Bageshri",
+          "score": 0.6619
+        }
+      ]
+    },
+    "bhupali": {
+      "id": "bhupali",
+      "label": "Raga Bhupali (Vocal B3 · Sibling of Deshkar)",
+      "detectedTonic": "B (246.94 Hz)",
+      "activeSwaras": "S R2 G3 P D2",
+      "detectedVadi": "G3 / D2",
+      "queryText": "task: search result | query: Kalyan thaat, Audava (5-note Pentatonic) scale (5 notes: S R2 G3 P D2). Shuddha Madhyam (M1). All Shuddha swaras (no komal notes). Active swaras: Shadja (Sa) [S], Shuddha Rishabh (Re) [R2], Shuddha Gandhar (Ga) [G3], Pancham (Pa) [P], Shuddha Dhaivat (Dha) [D2]. Omissions: strictly omits Madhyam (M1 M2), strictly omits Nishad (n2 N3); excluded chromatic swaras: r1 g2 M1 M2 d1 n2 N3. Vadi principal swara: Shuddha Gandhar (Ga) [G3], Samvadi consonant swara: Shuddha Dhaivat (Dha) [D2]. Aroha ascending: S R2 G3 P D2. Avaroha descending: D2 P G3 R2 S. Pakad catch phrases: S R2 G3, R2 G3 P, S D2 P, D2 P G3, P G3 R2, G3 R2 S",
+      "systemOneTop3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 1
+        },
+        {
+          "id": "deshkar",
+          "name": "Raga Deshkar",
+          "score": 0
+        },
+        {
+          "id": "shuddha_kalyan",
+          "name": "Raga Shuddha Kalyan",
+          "score": 0
+        }
+      ],
+      "stage1Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.99
+        },
+        {
+          "id": "deshkar",
+          "name": "Raga Deshkar",
+          "score": 0.99
+        },
+        {
+          "id": "shuddha_kalyan",
+          "name": "Raga Shuddha Kalyan",
+          "score": 0.926
+        }
+      ],
+      "eg2Hybrid768Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.9013
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8468
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.8303
+        }
+      ],
+      "eg2Hybrid256Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.9107
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8608
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.8523
+        }
+      ],
+      "eg2Hybrid128Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.9303
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8984
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.8961
+        }
+      ],
+      "eg2ZeroShotTop3": [
+        {
+          "id": "deshkar",
+          "name": "Raga Deshkar",
+          "score": 0.6321
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.6308
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.6229
+        }
+      ]
+    },
+    "malkauns": {
+      "id": "malkauns",
+      "label": "Raga Malkauns (Vocal C3)",
+      "detectedTonic": "C (130.81 Hz)",
+      "activeSwaras": "S g2 M1 d1 n2",
+      "detectedVadi": "M1 / n2",
+      "queryText": "task: search result | query: Asavari thaat, Audava (5-note Pentatonic) scale (5 notes: S g2 M1 d1 n2). Shuddha Madhyam (M1). Komal swaras: Komal Gandhar (ga) [g2], Komal Dhaivat (dha) [d1], Komal Nishad (ni) [n2]. Active swaras: Shadja (Sa) [S], Komal Gandhar (ga) [g2], Shuddha Madhyam (Ma) [M1], Komal Dhaivat (dha) [d1], Komal Nishad (ni) [n2]. Omissions: strictly omits Rishabh (r1 R2), strictly omits Pancham (P); excluded chromatic swaras: r1 R2 G3 M2 P D2 N3. Vadi principal swara: Shuddha Madhyam (Ma) [M1], Samvadi consonant swara: Komal Nishad (ni) [n2]. Aroha ascending: S g2 M1 d1 n2. Avaroha descending: n2 M1 g2 S. Pakad catch phrases: S g2 M1, g2 M1 d1, M1 d1 n2, d1 n2 S",
+      "systemOneTop3": [
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.97
+        },
+        {
+          "id": "malkosh_malkauns",
+          "name": "Raga Malkosh Malkauns",
+          "score": 0.03
+        },
+        {
+          "id": "jayanthashri",
+          "name": "Raga Jayanthashri",
+          "score": 0
+        }
+      ],
+      "stage1Top3": [
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.953
+        },
+        {
+          "id": "malkosh_malkauns",
+          "name": "Raga Malkosh Malkauns",
+          "score": 0.813
+        },
+        {
+          "id": "jayanthashri",
+          "name": "Raga Jayanthashri",
+          "score": 0.746
+        }
+      ],
+      "eg2Hybrid768Top3": [
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8486
+        },
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.8418
+        },
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.8353
+        }
+      ],
+      "eg2Hybrid256Top3": [
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.8694
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.861
+        },
+        {
+          "id": "puriya_dhanashri",
+          "name": "Raga Puriya Dhanashri",
+          "score": 0.854
+        }
+      ],
+      "eg2Hybrid128Top3": [
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.9103
+        },
+        {
+          "id": "puriya_dhanashri",
+          "name": "Raga Puriya Dhanashri",
+          "score": 0.9049
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8973
+        }
+      ],
+      "eg2ZeroShotTop3": [
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.6398
+        },
+        {
+          "id": "bageshri",
+          "name": "Raga Bageshri",
+          "score": 0.6264
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.6212
+        }
+      ]
+    },
+    "darbari_kanada": {
+      "id": "darbari_kanada",
+      "label": "Raga Darbari Kanada (Vocal C3)",
+      "detectedTonic": "C (130.81 Hz)",
+      "activeSwaras": "S R2 g2 M1 P d1 n2",
+      "detectedVadi": "g2 / R2",
+      "queryText": "task: search result | query: Asavari thaat, Sampurna (7-note Heptatonic) scale (7 notes: S R2 g2 M1 P d1 n2). Shuddha Madhyam (M1). Komal swaras: Komal Gandhar (ga) [g2], Komal Dhaivat (dha) [d1], Komal Nishad (ni) [n2]. Active swaras: Shadja (Sa) [S], Shuddha Rishabh (Re) [R2], Komal Gandhar (ga) [g2], Shuddha Madhyam (Ma) [M1], Pancham (Pa) [P], Komal Dhaivat (dha) [d1], Komal Nishad (ni) [n2]. Omissions: ; excluded chromatic swaras: r1 G3 M2 D2 N3. Vadi principal swara: Komal Gandhar (ga) [g2], Samvadi consonant swara: Shuddha Rishabh (Re) [R2]. Aroha ascending: S R2 g2 M1 P d1 n2. Avaroha descending: n2 d1 P M1 g2 R2 S. Pakad catch phrases: S R2 g2, R2 g2 R2, d1 n2 P, g2 M1 R2, M1 R2 S, n2 P M1, P g2 M1",
+      "systemOneTop3": [
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.9
+        },
+        {
+          "id": "adana",
+          "name": "Raga Adana",
+          "score": 0.09
+        },
+        {
+          "id": "gopikavasantam",
+          "name": "Raga Gopikavasantam",
+          "score": 0.01
+        }
+      ],
+      "stage1Top3": [
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.984
+        },
+        {
+          "id": "adana",
+          "name": "Raga Adana",
+          "score": 0.902
+        },
+        {
+          "id": "sukumari",
+          "name": "Raga Sukumari",
+          "score": 0.823
+        }
+      ],
+      "eg2Hybrid768Top3": [
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.855
+        },
+        {
+          "id": "puriya_dhanashri",
+          "name": "Raga Puriya Dhanashri",
+          "score": 0.8447
+        },
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.8386
+        }
+      ],
+      "eg2Hybrid256Top3": [
+        {
+          "id": "todi",
+          "name": "Raga Miyan ki Todi",
+          "score": 0.8601
+        },
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.8573
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.8562
+        }
+      ],
+      "eg2Hybrid128Top3": [
+        {
+          "id": "puriya_dhanashri",
+          "name": "Raga Puriya Dhanashri",
+          "score": 0.9074
+        },
+        {
+          "id": "multani",
+          "name": "Raga Multani",
+          "score": 0.9054
+        },
+        {
+          "id": "todi",
+          "name": "Raga Miyan ki Todi",
+          "score": 0.8997
+        }
+      ],
+      "eg2ZeroShotTop3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.6053
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.595
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.5941
+        }
+      ]
+    },
+    "hamsadhwani": {
+      "id": "hamsadhwani",
+      "label": "Raga Hamsadhwani (Vocal G3)",
+      "detectedTonic": "G (196 Hz)",
+      "activeSwaras": "S R2 G3 P N3",
+      "detectedVadi": "R2 / P",
+      "queryText": "task: search result | query: Kalyan thaat, Audava (5-note Pentatonic) scale (5 notes: S R2 G3 P N3). Shuddha Madhyam (M1). All Shuddha swaras (no komal notes). Active swaras: Shadja (Sa) [S], Shuddha Rishabh (Re) [R2], Shuddha Gandhar (Ga) [G3], Pancham (Pa) [P], Shuddha Nishad (Ni) [N3]. Omissions: strictly omits Madhyam (M1 M2), strictly omits Dhaivat (d1 D2); excluded chromatic swaras: r1 g2 M1 M2 d1 D2 n2. Vadi principal swara: Shuddha Rishabh (Re) [R2], Samvadi consonant swara: Pancham (Pa) [P]. Aroha ascending: S R2 G3 P N3. Avaroha descending: N3 P G3 R2 S. Pakad catch phrases: P G3 R2, G3 R2 S",
+      "systemOneTop3": [
+        {
+          "id": "hamsadhwani",
+          "name": "Raga Hamsadhwani",
+          "score": 1
+        },
+        {
+          "id": "chhayanat",
+          "name": "Raga Chhayanat",
+          "score": 0
+        },
+        {
+          "id": "shyam_kalyan",
+          "name": "Raga Shyam Kalyan",
+          "score": 0
+        }
+      ],
+      "stage1Top3": [
+        {
+          "id": "hamsadhwani",
+          "name": "Raga Hamsadhwani",
+          "score": 0.945
+        },
+        {
+          "id": "chhayanat",
+          "name": "Raga Chhayanat",
+          "score": 0.79
+        },
+        {
+          "id": "shyam_kalyan",
+          "name": "Raga Shyam Kalyan",
+          "score": 0.79
+        }
+      ],
+      "eg2Hybrid768Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.9013
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8454
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.8296
+        }
+      ],
+      "eg2Hybrid256Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.9125
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8602
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.8528
+        }
+      ],
+      "eg2Hybrid128Top3": [
+        {
+          "id": "bhupali",
+          "name": "Raga Bhupali",
+          "score": 0.9306
+        },
+        {
+          "id": "malkauns",
+          "name": "Raga Malkauns",
+          "score": 0.8982
+        },
+        {
+          "id": "desh",
+          "name": "Raga Desh",
+          "score": 0.8976
+        }
+      ],
+      "eg2ZeroShotTop3": [
+        {
+          "id": "bageshri",
+          "name": "Raga Bageshri",
+          "score": 0.6344
+        },
+        {
+          "id": "darbari_kanada",
+          "name": "Raga Darbari Kanada",
+          "score": 0.622
+        },
+        {
+          "id": "bhimpalasi",
+          "name": "Raga Bhimpalasi",
+          "score": 0.6171
+        }
+      ]
+    }
+  }
+}

@@ -26,7 +26,7 @@
   <link rel="describedby" href="./.well-known/mcp/server-card.json" type="application/json" />
   <link rel="describedby" href="./.well-known/agent-card.json" type="application/json" />
   <link rel="describedby" href="./llms.txt" type="text/plain" />
-  <link rel="stylesheet" href="./styles.css?v=4" />
+  <link rel="stylesheet" href="./styles.css?v=5" />
 </head>
 <body>
   <!-- Subtle Top Utility Bar -->
@@ -46,6 +46,9 @@
         <button type="button" class="top-pill-btn" id="btn-toggle-engine" aria-expanded="false">
           <span class="status-dot" id="engine-dot"></span>
           <span id="engine-status-text">Engine: Jev / OpenJev</span>
+        </button>
+        <button type="button" class="top-pill-btn" id="btn-toggle-eval" aria-expanded="false">
+          <span>Eval &amp; Science · EmbeddingGemma 2</span>
         </button>
         <button type="button" class="top-pill-btn" id="btn-toggle-arch" aria-expanded="false">
           <span>How It Works</span>
@@ -265,6 +268,137 @@
             <h3>10 Typed Primitives &amp; Hierarchical Beam</h3>
             <p>
               Compiles extracted swara telemetry into 10 batched System One primitives: 4× <code>choice()</code> (Primary Raga, Parent Thaat, Idiom, Prahar), 2× <code>score()</code> (Gamaka &amp; Rasa 0–3 rubrics), and 4× <code>noul()</code> (Pakad &amp; Vadi verifiers). Candidates are ranked by geometric beam <code>√(P(Thaat) × P(Raga))</code> via TypeSafe Cloud (<code>jev-latest</code>) or in-browser OpenJev (<code>@wllama/wllama</code> <code>Qwen3-0.6B</code> 1-token direct option logit readout).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collapsible Science-Baked Evaluation & EmbeddingGemma 2 Tab Drawer -->
+    <div class="top-drawer" id="drawer-eval" hidden>
+      <div class="drawer-inner">
+        <div class="drawer-header">
+          <span class="drawer-title">EVAL &amp; SCIENCE · EMBEDDINGGEMMA 2 (570M MULTIMODAL) VS. YIN F0 DSP + SYSTEM ONE</span>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <a href="./eval-results.json" target="_blank" rel="noopener" class="openjev-link-badge">
+              Raw Benchmark JSON (N=46) ↗
+            </a>
+            <button type="button" class="drawer-close" id="btn-close-eval">Close</button>
+          </div>
+        </div>
+
+        <p class="arch-intro">
+          Empirical benchmark evaluating <strong>Google DeepMind EmbeddingGemma 2</strong> (<code>onnx-community/embeddinggemma-2-ONNX</code>, Gemma 4 architecture, selective <code>570M</code> Text <code>270M</code> + Audio <code>300M</code> in <code>q4</code>) across <strong>9 architectural configurations</strong> on <strong>N = 46 audio recordings</strong> (18 human vocal clips across 3 tonic keys + 28 multi-harmonic performances across canonical <code>Sa = D3</code> and <code>+600¢</code> tritone-shifted <code>Sa = G#3</code>, including 3 shared-swara sibling pairs) against both the <strong>14-Raga Concert Pool</strong> and the <strong>Full 962-Raga Catalog</strong> on Apple M5 (<code>arm64</code>, 10 cores).
+        </p>
+
+        <!-- 4 Executive KPI Cards -->
+        <div class="eval-kpi-grid">
+          <div class="eval-kpi-card highlight">
+            <div class="mono-label">SWARAGA FULL PIPELINE (YIN F0 + JEV)</div>
+            <div class="eval-kpi-num">93.5% <span class="eval-kpi-sub">Top-1 (14) · 84.8% (962)</span></div>
+            <div class="eval-kpi-meta">95% CI [87.0%, 100%] · Macro-F1 95.6% · 367 ms p50</div>
+          </div>
+          <div class="eval-kpi-card">
+            <div class="mono-label">EMBEDDINGGEMMA 2 AUDIO k-NN (300M)</div>
+            <div class="eval-kpi-num">58.7% <span class="eval-kpi-sub">75.0% Canonical → 46.2% Shifted</span></div>
+            <div class="eval-kpi-meta">−28.8% Tonic-Shift Drop · 94.4% Same-Key Vocal · 2,087 ms p50</div>
+          </div>
+          <div class="eval-kpi-card">
+            <div class="mono-label">EMBEDDINGGEMMA 2 HYBRID MRL (768d / 512d)</div>
+            <div class="eval-kpi-num">47.8% <span class="eval-kpi-sub">Top-1 · 73.9% Top-3 Recall</span></div>
+            <div class="eval-kpi-meta">512d MRL 100% Lossless · −3.8% Tonic Drop · 624 ms p50</div>
+          </div>
+          <div class="eval-kpi-card">
+            <div class="mono-label">EMBEDDINGGEMMA 2 ZERO-SHOT (AUDIO→TEXT)</div>
+            <div class="eval-kpi-num">6.5% <span class="eval-kpi-sub">Top-1 (14) · 0.0% (962)</span></div>
+            <div class="eval-kpi-meta">Random Chance = 7.1% · No Sargam Interval Isomorphism</div>
+          </div>
+        </div>
+
+        <!-- Interactive Slice Filter Bar -->
+        <div class="eval-filter-bar" role="group" aria-label="Evaluation Slice Highlight">
+          <span class="mono-label">FOCUS SLICE:</span>
+          <button type="button" class="eval-slice-btn active" data-eval-slice="all">All Metrics (N = 46)</button>
+          <button type="button" class="eval-slice-btn" data-eval-slice="tonic">Tonic Invariance (Sa=D3 vs +600¢ Shift)</button>
+          <button type="button" class="eval-slice-btn" data-eval-slice="sibling">Shared-Swara Siblings (Bhupali/Deshkar · Todi/Multani)</button>
+          <button type="button" class="eval-slice-btn" data-eval-slice="mrl">Matryoshka MRL (768d → 512d → 256d → 128d)</button>
+        </div>
+
+        <!-- Head-to-Head Empirical Benchmark Table -->
+        <div class="eval-table-wrap">
+          <table class="eval-table" id="eval-benchmark-table">
+            <thead>
+              <tr>
+                <th>Engine &amp; Architecture</th>
+                <th>Modality &amp; Params</th>
+                <th>Top-1 (14) &amp; 95% CI</th>
+                <th>Top-3 (14)</th>
+                <th>962-Raga (Top-1 / Top-5)</th>
+                <th>Macro-F1</th>
+                <th>Canonical Sa</th>
+                <th>Transposed Sa (Δ)</th>
+                <th>Sibling Pairs</th>
+                <th>Latency p50</th>
+              </tr>
+            </thead>
+            <tbody id="eval-matrix-tbody">
+              <!-- Populated dynamically by app.js from eval-results.json -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Interactive Per-Raga Probe: EmbeddingGemma 2 vs. Swaraga System One -->
+        <div class="eval-probe-section">
+          <div class="eval-probe-header">
+            <div>
+              <div class="arch-science-eyebrow"><span class="step-num">LIVE</span> SIDE-BY-SIDE RAGA PROBE · EMBEDDINGGEMMA 2 COSINE VS. SYSTEM ONE</div>
+              <h3 style="margin:4px 0 0; font-size:0.98rem;">Inspect Real Cosine Similarities, MRL Truncation &amp; Bi-Encoder Negation Collisions</h3>
+            </div>
+            <div class="eval-probe-pills" id="eval-probe-pills">
+              <button type="button" class="sample-pill active" data-probe-id="yaman">Yaman (C#3)</button>
+              <button type="button" class="sample-pill" data-probe-id="bhairav">Bhairav (G#3)</button>
+              <button type="button" class="sample-pill" data-probe-id="bhupali">Bhupali (B3)</button>
+              <button type="button" class="sample-pill" data-probe-id="malkauns">Malkauns (C3)</button>
+              <button type="button" class="sample-pill" data-probe-id="darbari_kanada">Darbari (C3)</button>
+              <button type="button" class="sample-pill" data-probe-id="hamsadhwani">Hamsadhwani (G3)</button>
+            </div>
+          </div>
+          <div id="eval-probe-stage" class="eval-probe-stage">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+
+        <!-- 4 Science-Baked Research Findings Cards -->
+        <div class="arch-science-grid" style="margin-top:18px;">
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">01</span> TONIC INVARIANCE ABLATION (Δ = −28.8%)</div>
+            <h3>Why Raw Audio Embeddings Break Under Key Shifts</h3>
+            <p>
+              <code>Gemma4AudioFeatureExtractor</code> tokenizes 16 kHz audio via 128-bin HTK mel-spectrograms (<code>0–8,000 Hz</code>, 20 ms frame, 10 ms hop, 25 tokens/s). In Indian classical music, a raga is defined by relative frequency ratios to <strong>Adhara Shadja (Sa)</strong>, not absolute pitch. Shifting tonic by a tritone (<code>D3 = 146.8 Hz → G#3 = 207.7 Hz</code>) translates every harmonic by <code>√2</code> across mel bins, dropping EmbeddingGemma 2 Audio k-NN from <strong>75.0% → 46.2%</strong> (<code>−28.8%</code>), whereas YIN circular cent folding <code>1200 log₂(f₀/f_Sa) mod 1200</code> retains <strong>100% → 88.5%</strong>.
+            </p>
+          </div>
+
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">02</span> THE BI-ENCODER NEGATION PARADOX</div>
+            <h3>Why "Omits M2 &amp; N3" Attracts M2 &amp; N3 Queries</h3>
+            <p>
+              In a dense 768-d mean-pooled bi-encoder, listing forbidden <em>Varjya</em> swaras in a raga's text card (e.g., <em>"Raga Bhupali omits Teevra Madhyam M2 and Shuddha Nishad N3"</em>) injects positive token embeddings for <code>M2</code> and <code>N3</code> into Bhupali's vector—causing <em>Bhupali</em> (<code>0.8516</code>) to outscore <em>Yaman</em> (<code>0.8487</code>) on heptatonic Yaman queries. Removing negated <em>Varjya</em> text and encoding only positive spelled-out swaras lifts Yaman to #1 (<code>0.8784</code>), proving why Swaraga enforces an algebraic <code>−1.15 × VarjyaLeakage</code> penalty.
+            </p>
+          </div>
+
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">03</span> MATRYOSHKA MRL &amp; L2 RENORMALIZATION</div>
+            <h3>768d → 512d Lossless · 256d (1:3) · 128d (1:6)</h3>
+            <p>
+              EmbeddingGemma 2 is trained with Matryoshka Representation Learning (MRL). Slicing a unit vector <code>v[0:d]</code> breaks unit norm (<code>‖v[0:d]‖₂ &lt; 1</code>), so L2 renormalization <code>v̂ = v[0:d] / ‖v[0:d]‖₂</code> is mandatory before dot-product scoring. Empirically, <strong>512d</strong> (<code>1:1.5</code> compression) is <strong>100% lossless</strong> on the 14-raga pool (<strong>47.8% Top-1, 73.9% Top-3, 0.626 MRR</strong>), <strong>256d</strong> (<code>1:3</code>) retains <strong>67.4% Top-3 recall</strong> (<strong>91.2%</strong> retention), and <strong>128d</strong> drops to <strong>56.5% Top-3</strong>.
+            </p>
+          </div>
+
+          <div class="arch-science-card">
+            <div class="arch-science-eyebrow"><span class="step-num">04</span> HONEST ARCHITECTURAL TIERING</div>
+            <h3>Bi-Encoder Pruner (73.9% Top-3) vs. System One Executor (93.5%)</h3>
+            <p>
+              Shared-swara sibling ragas—<em>Bhupali</em> vs. <em>Deshkar</em> (both <code>S R2 G3 P D2</code>, Vadi <code>G3</code> vs. <code>D2</code>) and <em>Miyan ki Todi</em> vs. <em>Multani</em> (both <code>S r1 g2 M2 P d1 N3</code>)—score <strong>40.0%–53.3%</strong> in EmbeddingGemma 2 because single-vector pooling compresses sequential phrase order and dwell hierarchy. By pairing Stage 1 deterministic pruning with Stage 2 <strong>TypeSafe System One</strong> (<code>choice</code>, <code>score</code>, <code>noul</code>), Swaraga resolves sibling pairs at <strong>93.3% Top-1</strong> in <strong>367 ms</strong>.
             </p>
           </div>
         </div>
@@ -563,6 +697,6 @@
     </div>
   </footer>
 
-  <script type="module" src="./app.js?v=3"></script>
+  <script type="module" src="./app.js?v=5"></script>
 </body>
 </html>
