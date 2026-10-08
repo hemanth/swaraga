@@ -5,7 +5,7 @@ import {
   decodeAudioInBrowser,
   analyzeRagaAudioPCM,
   classifyRagaInBrowser
-} from './raga-browser-engine.js';
+} from './raga-browser-engine.js?v=3';
 
 const SWARA_LIST = [
   { index: 0, id: 'S', label: 'Shadja (Sa)' },
@@ -96,7 +96,7 @@ updateApiKeyBadge();
 
 function ensureOpenJevWorker() {
   if (openjevWorker) return openjevWorker;
-  openjevWorker = new Worker('./openjev-worker.js', { type: 'module' });
+  openjevWorker = new Worker('./openjev-worker.js?v=3', { type: 'module' });
   const headerStatusEl = document.getElementById('engine-status-text');
   openjevWorker.addEventListener('message', ({ data }) => {
     if (data.type === 'loading') {
