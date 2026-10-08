@@ -2,7 +2,8 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { SWARA_TABLE, RAGA_CATALOG } from './raga-catalog.js';
+import { SWARA_TABLE, TONIC_TEMPLATE_SCALES } from './raga-catalog.js';
+import { scoreRagaCandidates, identifyScale, SHORTLIST_SIZE } from '../public/raga-matcher.js';
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -214,13 +215,13 @@ function resolveTonic(voicedFrames, tonicOverride = null) {
 
     // Check how well the pitch histogram rotated to `pc` as Sa fits known Raga scale templates
     let bestTemplateFit = 0;
-    for (const raga of RAGA_CATALOG) {
+    for (const scale of TONIC_TEMPLATE_SCALES) {
       let inScaleMass = 0;
       let outScaleMass = 0;
       for (let offset = 0; offset < 12; offset++) {
         const swaraId = SWARA_TABLE[offset].id;
         const share = pcHist[(pc + offset) % 12] / totalWeight;
-        if (raga.swaras.includes(swaraId)) {
+        if (scale.includes(swaraId)) {
           inScaleMass += share;
         } else {
           outScaleMass += share;
@@ -591,56 +592,17 @@ export function analyzeRagaAudioPCM(samples, sampleRate = 16000, options = {}) {
         ? 'Shadava (6-note Hexatonic)'
         : 'Sampurna (7-note Heptatonic)';
 
-  // Compute deterministic acoustic-grammar match score against each Raga in RAGA_CATALOG
+  // Compute deterministic acoustic-grammar match score against every raga in the catalog
   const allDetectedPhrases = topNgrams.map((n) => n.phrase).join(' | ');
   const sequenceStr = stabilizedNotes.map((n) => n.swara).join(' ');
 
-  const candidateMatches = RAGA_CATALOG.map((raga) => {
-    // 1. Swara coverage & varjya penalty
-    let swaraRecall = 0;
-    for (const s of raga.swaras) {
-      swaraRecall += swaraDistribution[s] || 0;
-    }
-    let varjyaLeakage = 0;
-    for (const v of raga.varjya) {
-      varjyaLeakage += swaraDistribution[v] || 0;
-    }
-
-    // 2. Pakad n-gram matches in sequenceStr
-    const matchedPakads = raga.pakadNgrams.filter(
-      (ng) => sequenceStr.includes(ng) || allDetectedPhrases.includes(ng)
-    );
-    const pakadScore = raga.pakadNgrams.length > 0 ? matchedPakads.length / raga.pakadNgrams.length : 0;
-
-    // 3. Exact scale set Jaccard similarity
-    const activeSet = new Set(activeSwaras);
-    const ragaSet = new Set(raga.swaras);
-    const intersection = raga.swaras.filter((s) => activeSet.has(s)).length;
-    const union = new Set([...activeSwaras, ...raga.swaras]).size || 1;
-    const jaccard = intersection / union;
-
-    // 4. Vadi / Samvadi alignment
-    const vadiBonus =
-      (detectedVadi === raga.vadi ? 0.14 : 0) +
-      (detectedSamvadi === raga.samvadi || detectedVadi === raga.samvadi ? 0.08 : 0);
-
-    const acousticFit = Math.max(
-      0,
-      Math.min(
-        0.99,
-        swaraRecall * 0.42 - varjyaLeakage * 1.15 + jaccard * 0.32 + pakadScore * 0.28 + vadiBonus
-      )
-    );
-
-    return {
-      ragaId: raga.id,
-      ragaName: raga.name,
-      thaat: raga.thaat,
-      acousticFitScore: Number(acousticFit.toFixed(3)),
-      matchedPakadMotifs: matchedPakads,
-      varjyaLeakage: Number(varjyaLeakage.toFixed(3))
-    };
-  }).sort((a, b) => b.acousticFitScore - a.acousticFitScore);
+  const candidateMatches = scoreRagaCandidates({
+    swaraDistribution,
+    activeSwaras,
+    detectedVadi,
+    detectedSamvadi,
+    hasPhrase: (ng) => sequenceStr.includes(ng) || allDetectedPhrases.includes(ng)
+  });
 
   return {
     audioSummary: {
@@ -679,7 +641,8 @@ export function analyzeRagaAudioPCM(samples, sampleRate = 16000, options = {}) {
         ).toFixed(3)
       )
     },
-    acousticCandidateShortlist: candidateMatches.slice(0, 6),
+    scaleIdentity: identifyScale(activeSwaras),
+    acousticCandidateShortlist: candidateMatches.slice(0, SHORTLIST_SIZE),
     pitchContour,
     noteRibbons
   };

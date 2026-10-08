@@ -470,10 +470,10 @@
         </div>
       </section>
 
-      <!-- DIV 6: COLLAPSIBLE SYSTEM ONE PAYLOAD & 12-RAGA GRAMMAR REFERENCE -->
+      <!-- DIV 6: COLLAPSIBLE SYSTEM ONE PAYLOAD & RAGA GRAMMAR REFERENCE -->
       <details class="stream-card reveal-card details-card" data-reveal-step="6">
         <summary class="details-summary">
-          <span class="step-tag"><span class="step-num">06</span> INSPECT RAW SYSTEM ONE JSON PAYLOAD &amp; 12-RAGA GRAMMAR</span>
+          <span class="step-tag"><span class="step-num">06</span> INSPECT RAW SYSTEM ONE JSON PAYLOAD &amp; RAGA GRAMMAR CATALOG</span>
           <span class="mono-badge">Expand ▾</span>
         </summary>
         <div class="details-body">
@@ -493,7 +493,15 @@
               <pre id="inspector-response-json" class="code-block">Loading...</pre>
             </div>
           </div>
-          <div class="catalog-grid" id="catalog-grid" style="margin-top:24px;">
+          <input
+            type="search"
+            id="catalog-search"
+            class="studio-input"
+            style="margin-top:24px;width:100%;"
+            placeholder="Search ragas by name, alias, thaat, melakarta, or swaras (e.g. Kambhoji, Kafi, r1 G3 M2)..."
+          />
+          <div class="mono-label" id="catalog-count" style="margin-top:10px;"></div>
+          <div class="catalog-grid" id="catalog-grid" style="margin-top:14px;">
             <!-- Populated by app.js -->
           </div>
         </div>

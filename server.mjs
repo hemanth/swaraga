@@ -36,7 +36,7 @@ Classify Indian Classical Ragas (Hindustani & Carnatic) from any MP3/WAV recordi
    - Computes 12-Swara cent distribution (\`S r1 R2 g2 G3 M1 M2 P d1 D2 n2 N3\`), Vadi/Samvadi prominence, Varjya omitted notes, Aroha/Avaroha directional runs, Pakad 3-gram/4-gram motifs, and microtonal Gamaka/Andolan oscillation indices.
 2. **TypeSafe System One Judgment Pipeline (\`src/classifier.js\`)**:
    - Evaluates 10 parallel typed questions in one \`POST https://api.typesafe.ai/v1/systemone\` request via \`@typesafe-ai/sdk\`:
-     - \`primary_raga\` (\`Choice\` across 12 canonical ragas with structured rubrics)
+     - \`primary_raga\` (\`Choice\` across the top-12 acoustic shortlist of a 962-raga catalog plus an \`out_of_catalog\` open-set option)
      - \`thaat_family\` (\`Choice\` parent scale taxonomy for hierarchical beam scoring)
      - \`tradition_idiom\` (\`Choice\`: \`hindustani\`, \`carnatic\`, \`dual_canonical\`)
      - \`prahar_time_window\` (\`Choice\`: Samay Chakra time of day)

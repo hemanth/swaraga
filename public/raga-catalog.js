@@ -1,3 +1,6 @@
+import { MELAKARTA_NAMES, MELAKARTA_ALIASES, JANYA_ROWS, CORE_ALIASES } from './raga-lexicon.js';
+import { WIKI_RAGA_ROWS, WIKI_MELAKARTA_ALIASES } from './raga-wiki-lexicon.js';
+
 /**
  * Canonical 12 Swarasthanas of Indian Classical Music (Hindustani & Carnatic)
  * Indexed by semitone (0 to 11) and cent offset from Shadja (Sa = 0 cents).
@@ -26,10 +29,25 @@ export const THAAT_FAMILIES = {
   Kafi: 'Komal Gandhar (g2) and Komal Nishad (n2) with Shuddha Re and Dha: S R2 g2 M1 P D2 n2',
   Asavari: 'Komal Gandhar (g2), Komal Dhaivat (d1), and Komal Nishad (n2): S R2 g2 M1 P d1 n2',
   Bhairavi: 'All four komal swaras (r1, g2, d1, n2) with Shuddha Madhyam (M1): S r1 g2 M1 P d1 n2',
-  Todi: 'Komal Rishabh (r1), Komal Gandhar (g2), Teevra Madhyam (M2), Komal Dhaivat (d1), Shuddha Nishad (N3): S r1 g2 M2 P d1 N3'
+  Todi: 'Komal Rishabh (r1), Komal Gandhar (g2), Teevra Madhyam (M2), Komal Dhaivat (d1), Shuddha Nishad (N3): S r1 g2 M2 P d1 N3',
+  Marwa: 'Komal Rishabh (r1) and Teevra Madhyam (M2) with Shuddha Dhaivat (D2) and Shuddha Nishad (N3): S r1 G3 M2 P D2 N3'
 };
 
-export const RAGA_CATALOG = [
+// Canonical swara sets of each Thaat and its equivalent Melakarta
+export const THAAT_SCALES = {
+  Kalyan: { swaras: ['S', 'R2', 'G3', 'M2', 'P', 'D2', 'N3'], melakarta: 65 },
+  Bilawal: { swaras: ['S', 'R2', 'G3', 'M1', 'P', 'D2', 'N3'], melakarta: 29 },
+  Khamaj: { swaras: ['S', 'R2', 'G3', 'M1', 'P', 'D2', 'n2'], melakarta: 28 },
+  Bhairav: { swaras: ['S', 'r1', 'G3', 'M1', 'P', 'd1', 'N3'], melakarta: 15 },
+  Poorvi: { swaras: ['S', 'r1', 'G3', 'M2', 'P', 'd1', 'N3'], melakarta: 51 },
+  Kafi: { swaras: ['S', 'R2', 'g2', 'M1', 'P', 'D2', 'n2'], melakarta: 22 },
+  Asavari: { swaras: ['S', 'R2', 'g2', 'M1', 'P', 'd1', 'n2'], melakarta: 20 },
+  Bhairavi: { swaras: ['S', 'r1', 'g2', 'M1', 'P', 'd1', 'n2'], melakarta: 8 },
+  Todi: { swaras: ['S', 'r1', 'g2', 'M2', 'P', 'd1', 'N3'], melakarta: 45 },
+  Marwa: { swaras: ['S', 'r1', 'G3', 'M2', 'P', 'D2', 'N3'], melakarta: 53 }
+};
+
+export const CORE_RAGA_CATALOG = [
   {
     id: 'yaman',
     name: 'Raga Yaman',
@@ -306,6 +324,327 @@ export const RAGA_CATALOG = [
     gamakaProfile: 'Skips Pa in ascent (g2-M1-D2-n2-S) and introduces Pa in Vakra descent (M1-P-D2-g2-M1-g2-R2-S)',
     sampleFile: null
   }
+];
+
+
+const SWARA_ORDER = SWARA_TABLE.map((s) => s.id);
+
+export const PRAHAR_LABELS = {
+  dawn_sandhiprakash: 'Dawn / Early Morning Sandhiprakash (4 AM – 8 AM)',
+  late_morning: 'Late Morning (2nd Prahar of Day, 9 AM – 12 PM)',
+  afternoon: 'Afternoon (3rd Prahar of Day, 12 PM – 4 PM)',
+  dusk_sandhiprakash: 'Dusk / Sunset Sandhiprakash (4 PM – 7 PM)',
+  early_night: 'Early Night (1st Prahar of Night, 6 PM – 9 PM)',
+  late_night: 'Late Night (9 PM – 3 AM)',
+  sarva_kaalik: 'Sarva-Kaalik — not bound to a Samay Chakra window'
+};
+
+// Melakarta chakra grammar: R/G pair by chakra, D/N pair by position within chakra
+const RG_PAIRS = [['r1', 'R2'], ['r1', 'g2'], ['r1', 'G3'], ['R2', 'g2'], ['R2', 'G3'], ['g2', 'G3']];
+const DN_PAIRS = [['d1', 'D2'], ['d1', 'n2'], ['d1', 'N3'], ['D2', 'n2'], ['D2', 'N3'], ['n2', 'N3']];
+const RG_LABELS = [['R1', 'G1'], ['R1', 'G2'], ['R1', 'G3'], ['R2', 'G2'], ['R2', 'G3'], ['R3', 'G3']];
+const DN_LABELS = [['D1', 'N1'], ['D1', 'N2'], ['D1', 'N3'], ['D2', 'N2'], ['D2', 'N3'], ['D3', 'N3']];
+
+export function melakartaSwaras(number) {
+  const idx = (number - 1) % 36;
+  const [r, g] = RG_PAIRS[Math.floor(idx / 6)];
+  const [d, n] = DN_PAIRS[idx % 6];
+  return ['S', r, g, number <= 36 ? 'M1' : 'M2', 'P', d, n];
+}
+
+const MELAKARTA_SCALES = Array.from({ length: 72 }, (_, i) => melakartaSwaras(i + 1));
+
+function melakartaLabel(number) {
+  const idx = (number - 1) % 36;
+  const [r, g] = RG_LABELS[Math.floor(idx / 6)];
+  const [d, n] = DN_LABELS[idx % 6];
+  return `S ${r} ${g} ${number <= 36 ? 'M1' : 'M2'} P ${d} ${n}`;
+}
+
+const sameSet = (a, b) => a.length === b.length && a.every((s) => b.includes(s));
+
+/** Exact Melakarta number for a 7-swara set, or null if the set is not a Melakarta. */
+export function melakartaForSwaras(swaras) {
+  for (let n = 1; n <= 72; n++) {
+    if (sameSet(MELAKARTA_SCALES[n - 1], swaras)) return n;
+  }
+  return null;
+}
+
+/** Parent Melakarta for any swara set: exact match, else the Thaat-equivalent or first containing scale. */
+export function parentMelakartaFor(swaras, preferredThaat = null) {
+  const exact = melakartaForSwaras(swaras);
+  if (exact) return { number: exact, name: MELAKARTA_NAMES[exact - 1], exact: true };
+  const supersets = [];
+  for (let n = 1; n <= 72; n++) {
+    if (swaras.every((s) => MELAKARTA_SCALES[n - 1].includes(s))) supersets.push(n);
+  }
+  if (supersets.length === 0) return null;
+  const preferred = THAAT_SCALES[preferredThaat]?.melakarta;
+  const number = supersets.includes(preferred) ? preferred : supersets[0];
+  return { number, name: MELAKARTA_NAMES[number - 1], exact: false };
+}
+
+/** Thaat whose canonical scale has the smallest symmetric difference with the swara set. */
+export function nearestThaat(swaras) {
+  let best = 'Bilawal';
+  let bestDist = Infinity;
+  for (const [thaat, { swaras: scale }] of Object.entries(THAAT_SCALES)) {
+    const dist =
+      scale.filter((s) => !swaras.includes(s)).length + swaras.filter((s) => !scale.includes(s)).length;
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = thaat;
+    }
+  }
+  return best;
+}
+
+/**
+ * Structural identity of any linear (non-vakra) janya: its aroha/avaroha jati and every Melakarta that
+ * contains it. Covers the full theoretical space of 72 × 483 = 34,776 linear janya ragas, named or not.
+ */
+export function classifyJanyaScale(arohaSwaras, avarohaSwaras) {
+  const swaras = orderedSwaras([...arohaSwaras, ...avarohaSwaras].join(' '));
+  const parentMelakartas = [];
+  for (let n = 1; n <= 72; n++) {
+    if (swaras.every((s) => MELAKARTA_SCALES[n - 1].includes(s))) parentMelakartas.push(n);
+  }
+  const up = orderedSwaras(arohaSwaras.join(' ')).length;
+  const down = orderedSwaras(avarohaSwaras.join(' ')).length;
+  return {
+    swaras,
+    jati: `${jatiName(up)}-${jatiName(down)}`,
+    isMelakarta: up === 7 && down === 7 && parentMelakartas.length === 1,
+    parentMelakartas
+  };
+}
+
+export function orderedSwaras(...phrases) {
+  const present = new Set(phrases.join(' ').split(/\s+/).filter(Boolean));
+  return SWARA_ORDER.filter((id) => present.has(id));
+}
+
+function jatiName(count) {
+  if (count >= 7) return 'Sampurna';
+  if (count === 6) return 'Shadava';
+  if (count === 5) return 'Audava';
+  return 'Svarantara';
+}
+
+// Directional trigrams of the aroha/avaroha stand in for an uncatalogued pakad
+function deriveNgrams(...phrases) {
+  const grams = new Set();
+  for (const phrase of phrases) {
+    const tokens = phrase.split(/\s+/).filter(Boolean);
+    for (let i = 2; i < tokens.length; i++) {
+      const tri = tokens.slice(i - 2, i + 1);
+      if (new Set(tri).size === 3) grams.add(tri.join(' '));
+    }
+  }
+  return [...grams];
+}
+
+function describeParent(parent) {
+  if (!parent) return 'Bhashanga / mixed scale (no single Melakarta parent)';
+  return parent.exact
+    ? `${parent.name} (Melakarta ${parent.number})`
+    : `Janya of ${parent.name} (Melakarta ${parent.number})`;
+}
+
+function buildMelakartaEntry(number) {
+  const name = MELAKARTA_NAMES[number - 1];
+  const swaras = melakartaSwaras(number);
+  const aroha = `${swaras.join(' ')} S`;
+  const avaroha = `S ${[...swaras].reverse().join(' ')}`;
+  const aliases = [...(MELAKARTA_ALIASES[number] || [])];
+  return {
+    id: name.toLowerCase(),
+    name: `Raga ${name}`,
+    carnaticEquivalent: `Melakarta ${number} (${melakartaLabel(number)})${aliases.length ? ` — also ${aliases.join(', ')}` : ''}`,
+    tradition: 'Carnatic Melakarta',
+    thaat: nearestThaat(swaras),
+    jati: 'Sampurna-Sampurna (7 notes)',
+    swaras,
+    varjya: SWARA_ORDER.filter((id) => !swaras.includes(id)),
+    aroha,
+    avaroha,
+    pakad: '— (parent scale; scored on aroha/avaroha contour)',
+    pakadNgrams: deriveNgrams(aroha, avaroha),
+    vadi: '—',
+    samvadi: '—',
+    nyasa: [],
+    prahar: PRAHAR_LABELS.sarva_kaalik,
+    praharKey: 'sarva_kaalik',
+    rasa: '—',
+    gamakaProfile: 'Carnatic parent (Melakarta) scale — gamaka idiom depends on the janya rendered',
+    sampleFile: null,
+    melakarta: { number, name, exact: true },
+    aliases,
+    source: 'melakarta'
+  };
+}
+
+function buildJanyaEntry(
+  [id, name, trad, parent, aroha, avaroha, vadi = null, samvadi = null, praharKey = null, aliases = []],
+  source = 'lexicon'
+) {
+  const swaras = orderedSwaras(aroha, avaroha);
+  const thaat =
+    typeof parent === 'string'
+      ? parent
+      : nearestThaat(typeof parent === 'number' ? melakartaSwaras(parent) : swaras);
+  const mela =
+    typeof parent === 'number'
+      ? { number: parent, name: MELAKARTA_NAMES[parent - 1], exact: sameSet(melakartaSwaras(parent), swaras) }
+      : parentMelakartaFor(swaras, thaat);
+  const up = orderedSwaras(aroha).length;
+  const down = orderedSwaras(avaroha).length;
+  const key = praharKey || (trad === 'C' ? 'sarva_kaalik' : 'early_night');
+  const tradition = { H: 'Hindustani Classical', C: 'Carnatic Classical', HC: 'Hindustani & Carnatic Dual' }[trad];
+  return {
+    id,
+    name,
+    carnaticEquivalent: `${describeParent(mela)}${aliases.length ? ` — also ${aliases.join(', ')}` : ''}`,
+    tradition,
+    thaat,
+    jati: `${jatiName(up)}-${jatiName(down)} (${up} up, ${down} down)`,
+    swaras,
+    varjya: SWARA_ORDER.filter((s) => !swaras.includes(s)),
+    aroha,
+    avaroha,
+    pakad: '— (scored on aroha/avaroha contour)',
+    pakadNgrams: deriveNgrams(aroha, avaroha),
+    vadi: vadi || '—',
+    samvadi: samvadi || '—',
+    nyasa: [vadi, samvadi].filter(Boolean),
+    prahar: PRAHAR_LABELS[key],
+    praharKey: key,
+    rasa: '—',
+    gamakaProfile: `${tradition} raga — characteristic phrasing follows its aroha/avaroha (${aroha} / ${avaroha})`,
+    sampleFile: null,
+    melakarta: mela,
+    aliases: [...aliases],
+    source
+  };
+}
+
+function enrichCoreEntry(raga) {
+  return {
+    ...raga,
+    melakarta: parentMelakartaFor(raga.swaras, raga.thaat),
+    aliases: [...(CORE_ALIASES[raga.id] || [])],
+    source: 'curated'
+  };
+}
+
+// Spelling-tolerant name key: Kedaragowla ~ Kedaragaula, Mohanam ~ Mohana, Sohini ~ Sohni
+function nameKey(name) {
+  return name
+    .toLowerCase()
+    .replace(/^raga\s+/, '')
+    .replace(/\(.*?\)/g, '')
+    .replace(/[^a-z]/g, '')
+    .replace(/h/g, '')
+    .replace(/w/g, 'v')
+    .replace(/o[vu]/g, 'au')
+    .replace(/ee|ii/g, 'i')
+    .replace(/oo|uu/g, 'u')
+    .replace(/(.)\1+/g, '$1')
+    .replace(/m$/, '');
+}
+
+function editDistance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let prev = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cur = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = cur;
+    }
+  }
+  return row[b.length];
+}
+
+const sameTradition = (a, b) =>
+  a.tradition.includes('Dual') || b.tradition.includes('Dual') || a.tradition.split(' ')[0] === b.tradition.split(' ')[0];
+
+const scaleDistance = (a, b) => a.filter((s) => !b.includes(s)).length + b.filter((s) => !a.includes(s)).length;
+
+/**
+ * Merge Wikipedia-sourced ragas into the hand-built catalog. A row naming an already-catalogued raga
+ * (spelling-tolerant name, scale within one swara — exact across traditions) becomes an alias; a row whose id collides with a
+ * different raga (e.g. Carnatic vs Hindustani Poorvi) gets a tradition-suffixed id.
+ */
+function mergeWikiRagas(catalog) {
+  const byId = new Map(catalog.map((r) => [r.id, r]));
+  const melakartas = catalog.filter((r) => r.source === 'melakarta');
+  const keyIndex = [];
+  const indexEntry = (raga) => {
+    for (const label of [raga.name, ...raga.aliases]) keyIndex.push({ key: nameKey(label), raga });
+  };
+  catalog.forEach(indexEntry);
+
+  const findDuplicate = (entry) => {
+    const key = nameKey(entry.name);
+    return keyIndex.find(
+      (k) =>
+        k.key[0] === key[0] &&
+        (k.key === key || editDistance(k.key, key) <= 2) &&
+        // Same-named ragas across traditions (Carnatic vs Hindustani Poorvi) must share the exact scale
+        scaleDistance(k.raga.swaras, entry.swaras) <= (sameTradition(k.raga, entry) ? 1 : 0)
+    )?.raga;
+  };
+
+  const merged = [];
+  for (const row of WIKI_RAGA_ROWS) {
+    const entry = buildJanyaEntry([row[0], `Raga ${row[1]}`, ...row.slice(2)], 'wikipedia');
+    // Asampurna-system names sung as the plain parent scale (Janatodi, Chamaram) are Melakarta aliases
+    const mela = typeof row[3] === 'number' ? melakartas[row[3] - 1] : null;
+    const duplicate =
+      mela && entry.aroha === mela.aroha && entry.avaroha === mela.avaroha ? mela : findDuplicate(entry);
+    if (duplicate) {
+      const alias = row[1];
+      if (nameKey(alias) !== nameKey(duplicate.name) && !duplicate.aliases.includes(alias)) duplicate.aliases.push(alias);
+      continue;
+    }
+    if (byId.has(entry.id)) {
+      const suffix = row[2] === 'H' ? 'hindustani' : 'carnatic';
+      entry.id = `${entry.id}_${suffix}`;
+      entry.name = `${entry.name} (${suffix[0].toUpperCase()}${suffix.slice(1)})`;
+      if (byId.has(entry.id)) continue;
+    }
+    byId.set(entry.id, entry);
+    indexEntry(entry);
+    merged.push(entry);
+  }
+  return merged;
+}
+
+function buildCatalog() {
+  const melakartas = MELAKARTA_NAMES.map((_, i) => buildMelakartaEntry(i + 1));
+  for (const mela of melakartas) {
+    for (const alias of WIKI_MELAKARTA_ALIASES[mela.melakarta.number] || []) {
+      if (nameKey(alias) !== nameKey(mela.name) && !mela.aliases.includes(alias)) mela.aliases.push(alias);
+    }
+  }
+  const curated = [...CORE_RAGA_CATALOG.map(enrichCoreEntry), ...JANYA_ROWS.map((row) => buildJanyaEntry(row))];
+  const wiki = mergeWikiRagas([...curated, ...melakartas]);
+  return [...curated, ...wiki, ...melakartas];
+}
+
+/**
+ * Full searchable raga universe: 12 hand-curated ragas, the janya lexicon, Wikipedia-sourced named ragas,
+ * and all 72 Melakartas.
+ */
+export const RAGA_CATALOG = buildCatalog();
+
+// Scale templates used to stabilize tonic (Sa) detection: curated ragas plus the 10 Thaats
+export const TONIC_TEMPLATE_SCALES = [
+  ...CORE_RAGA_CATALOG.map((r) => r.swaras),
+  ...Object.values(THAAT_SCALES).map((t) => t.swaras)
 ];
 
 export function getRagaById(id) {

@@ -9,7 +9,7 @@
     "tools": [
       {
         "name": "list_ragas",
-        "description": "Return the 12 canonical Hindustani and Carnatic ragas, swarasthanas, parent Thaats, Vadi/Samvadi, and Pakad motifs.",
+        "description": "Return the raga catalog (~960 ragas: 12 curated, ~880 named Hindustani/Carnatic janya ragas, and all 72 Melakartas) with swarasthanas, parent Thaats, Vadi/Samvadi, and Pakad motifs.",
         "parameters": {
           "type": "object",
           "properties": {

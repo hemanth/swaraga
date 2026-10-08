@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { TypeSafeClient, choice, score, noul } from '@typesafe-ai/sdk';
-import { RAGA_CATALOG, THAAT_FAMILIES, getRagaById } from './raga-catalog.js';
+import { THAAT_FAMILIES } from './raga-catalog.js';
+import { buildCandidatePool, identifyScale, openSetFitScore, OUT_OF_CATALOG_ID } from '../public/raga-matcher.js';
 
 // Load TYPESAFE_API_KEY from environment or local .env file
 function resolveApiKey() {
@@ -51,8 +52,10 @@ function getTypeSafeClient(customApiKey = '') {
  * Build the structured state and typed System One questions for Raga classification.
  */
 export function buildRagaSystemOnePayload(dspTelemetry, metadata = {}) {
+  const pool = buildCandidatePool(dspTelemetry);
+  const scaleIdentity = dspTelemetry.scaleIdentity || identifyScale(dspTelemetry.scaleProfile.activeSwaras);
   const ragaCriteria = {};
-  for (const raga of RAGA_CATALOG) {
+  for (const raga of pool.ragas) {
     ragaCriteria[raga.id] = {
       name: raga.name,
       carnatic_equivalent: raga.carnaticEquivalent,
@@ -68,6 +71,14 @@ export function buildRagaSystemOnePayload(dspTelemetry, metadata = {}) {
       prahar: raga.prahar
     };
   }
+  ragaCriteria[OUT_OF_CATALOG_ID] = {
+    name: 'None of the shortlisted ragas (open-set / uncatalogued raga)',
+    when_to_choose:
+      'Choose only if the observed swara inventory, varjya notes, and phrases contradict every shortlisted raga grammar above',
+    observed_scale: scaleIdentity.swaras.join(' '),
+    nearest_thaat: scaleIdentity.thaat,
+    parent_melakarta: pool.outOfCatalog.carnaticEquivalent
+  };
 
   const state = {
     track_metadata: {
@@ -98,6 +109,12 @@ export function buildRagaSystemOnePayload(dspTelemetry, metadata = {}) {
       note_sequence_sample: dspTelemetry.directionalPhrases.noteSequenceSample
     },
     ornamentation: dspTelemetry.ornamentation,
+    scale_identity: {
+      observed_swaras: scaleIdentity.swaras.join(' '),
+      nearest_thaat: scaleIdentity.thaat,
+      parent_melakarta: scaleIdentity.melakarta,
+      catalog_ragas_with_identical_scale: scaleIdentity.exactCatalogMatches
+    },
     acoustic_candidate_shortlist: dspTelemetry.acousticCandidateShortlist
   };
 
@@ -124,7 +141,7 @@ export function buildRagaSystemOnePayload(dspTelemetry, metadata = {}) {
         hindustani:
           'Predominantly North Indian Hindustani raga grammar with characteristic Thaat, Pakad, and Andolan phrasing (e.g., Darbari Kanada, Miyan ki Todi, Desh, Bageshri)',
         carnatic:
-          'Predominantly South Indian Carnatic Janya/Melakarta kriti idiom with crisp kampita ornamentation (e.g., Hamsadhwani)'
+          'Predominantly South Indian Carnatic Janya/Melakarta kriti idiom with crisp kampita ornamentation (e.g., Hamsadhwani, Kambhoji, Shanmukhapriya)'
       }
     ),
 
@@ -136,7 +153,8 @@ export function buildRagaSystemOnePayload(dspTelemetry, metadata = {}) {
         afternoon: 'Afternoon / 3rd Prahar of Day (1 PM – 4 PM, e.g., Bhimpalasi)',
         dusk_sandhiprakash: 'Dusk / Sunset Sandhiprakash (4 PM – 7 PM, e.g., Puriya Dhanashri)',
         early_night: 'Early Night / 1st Prahar of Night (6 PM – 10 PM, e.g., Yaman, Bhupali, Hamsadhwani, Desh)',
-        late_night: 'Late Night / Midnight 3rd Prahar (10 PM – 3 AM, e.g., Malkauns, Darbari Kanada, Bageshri)'
+        late_night: 'Late Night / Midnight 3rd Prahar (10 PM – 3 AM, e.g., Malkauns, Darbari Kanada, Bageshri)',
+        sarva_kaalik: 'Not bound to a Prahar window (Melakarta parent scales, most Carnatic ragas, light ragas)'
       }
     ),
 
@@ -201,25 +219,30 @@ export function buildRagaSystemOnePayload(dspTelemetry, metadata = {}) {
  */
 function evaluateLocalFallback(dspTelemetry, payload) {
   const shortlist = dspTelemetry.acousticCandidateShortlist || [];
-  const top = shortlist[0] || { ragaId: 'yaman', acousticFitScore: 0.75, matchedPakadMotifs: [] };
-  const topRaga = getRagaById(top.ragaId) || RAGA_CATALOG[0];
+  const { ragas, outOfCatalog } = buildCandidatePool(dspTelemetry);
+  const options = [...ragas, outOfCatalog];
 
-  // Convert acousticFitScores into calibrated softmax probabilities across all 12 ragas
-  const rawMap = new Map(shortlist.map((c) => [c.ragaId, c.acousticFitScore]));
-  const temperature = 0.14;
+  // Convert acoustic fits into calibrated softmax probabilities across the shortlist + open-set option
+  const rawMap = new Map(shortlist.map((c) => [c.ragaId, c.rawFitScore ?? c.acousticFitScore]));
+  rawMap.set(
+    OUT_OF_CATALOG_ID,
+    openSetFitScore(dspTelemetry.swaraDistribution, dspTelemetry.scaleProfile.activeSwaras)
+  );
+  const temperature = 0.06;
   const exps = {};
   let sumExp = 0;
-  for (const r of RAGA_CATALOG) {
-    const fit = rawMap.get(r.id) ?? 0.08;
-    const val = Math.exp(fit / temperature);
+  for (const r of options) {
+    const val = Math.exp((rawMap.get(r.id) ?? 0.08) / temperature);
     exps[r.id] = val;
     sumExp += val;
   }
 
   const ragaProbs = {};
-  for (const r of RAGA_CATALOG) {
+  for (const r of options) {
     ragaProbs[r.id] = Number((exps[r.id] / sumExp).toFixed(4));
   }
+  const topRaga = options.reduce((best, r) => (ragaProbs[r.id] > ragaProbs[best.id] ? r : best), options[0]);
+  const top = shortlist.find((c) => c.ragaId === topRaga.id) || { matchedPakadMotifs: [] };
 
   // Thaat probabilities
   const thaatProbs = {};
@@ -233,6 +256,12 @@ function evaluateLocalFallback(dspTelemetry, payload) {
   const topProb = ragaProbs[topRaga.id] || 0.75;
   const confidence = Number(Math.min(0.96, Math.max(0.45, topProb * 1.08)).toFixed(3));
   const isAudava = dspTelemetry.scaleProfile.activeSwaras.length <= 5;
+  const traditionKey =
+    topRaga.tradition.startsWith('Carnatic')
+      ? 'carnatic'
+      : topRaga.tradition.includes('Dual')
+        ? 'dual_canonical'
+        : 'hindustani';
   const isSandhiprakash =
     dspTelemetry.scaleProfile.hasKomalRishabh &&
     dspTelemetry.scaleProfile.activeSwaras.includes('G3');
@@ -256,12 +285,12 @@ function evaluateLocalFallback(dspTelemetry, payload) {
       },
       tradition_idiom: {
         type: 'choice',
-        choice: topRaga.id === 'hamsadhwani' ? 'carnatic' : topRaga.tradition.includes('Dual') ? 'dual_canonical' : 'hindustani',
+        choice: traditionKey,
         confidence: 0.84,
         probabilities: {
-          dual_canonical: topRaga.tradition.includes('Dual') ? 0.78 : 0.15,
-          hindustani: topRaga.tradition.includes('Hindustani') && !topRaga.tradition.includes('Dual') ? 0.76 : 0.16,
-          carnatic: topRaga.id === 'hamsadhwani' ? 0.75 : 0.06
+          dual_canonical: traditionKey === 'dual_canonical' ? 0.78 : 0.11,
+          hindustani: traditionKey === 'hindustani' ? 0.78 : 0.11,
+          carnatic: traditionKey === 'carnatic' ? 0.78 : 0.11
         }
       },
       prahar_time_window: {
@@ -274,7 +303,8 @@ function evaluateLocalFallback(dspTelemetry, payload) {
           afternoon: topRaga.praharKey === 'afternoon' ? 0.85 : 0.03,
           dusk_sandhiprakash: topRaga.praharKey === 'dusk_sandhiprakash' ? 0.85 : 0.03,
           early_night: topRaga.praharKey === 'early_night' ? 0.85 : 0.03,
-          late_night: topRaga.praharKey === 'late_night' ? 0.85 : 0.03
+          late_night: topRaga.praharKey === 'late_night' ? 0.85 : 0.03,
+          sarva_kaalik: topRaga.praharKey === 'sarva_kaalik' ? 0.85 : 0.03
         }
       },
       gamaka_ornamentation: {
@@ -360,11 +390,15 @@ export async function classifyRagaWithTypeSafe(dspTelemetry, metadata = {}) {
   const thaatProbs = answers.thaat_family?.probabilities || {};
 
   // Build ranked candidate leaderboard with Hierarchical Beam Score: sqrt(P(Thaat) * P(Raga))
-  const rankedCandidates = RAGA_CATALOG.map((raga) => {
+  const pool = buildCandidatePool(dspTelemetry);
+  const rankedCandidates = [...pool.ragas, pool.outOfCatalog].map((raga) => {
     const ragaProb = Number(ragaProbs[raga.id] ?? 0);
     const parentThaatProb = Number(thaatProbs[raga.thaat] ?? 0.1);
     const beamScore = Number(Math.sqrt(Math.max(0, ragaProb * parentThaatProb)).toFixed(4));
-    const acousticEntry = dspTelemetry.acousticCandidateShortlist.find((c) => c.ragaId === raga.id);
+    const acousticEntry =
+      raga.id === OUT_OF_CATALOG_ID
+        ? { acousticFitScore: openSetFitScore(dspTelemetry.swaraDistribution, dspTelemetry.scaleProfile.activeSwaras) }
+        : dspTelemetry.acousticCandidateShortlist.find((c) => c.ragaId === raga.id);
     return {
       id: raga.id,
       name: raga.name,
@@ -381,6 +415,10 @@ export async function classifyRagaWithTypeSafe(dspTelemetry, metadata = {}) {
       gamakaProfile: raga.gamakaProfile,
       swaras: raga.swaras,
       varjya: raga.varjya,
+      tradition: raga.tradition,
+      melakarta: raga.melakarta,
+      aliases: raga.aliases,
+      source: raga.source,
       probability: Number(ragaProb.toFixed(4)),
       parentThaatProbability: Number(parentThaatProb.toFixed(4)),
       hierarchicalBeamScore: beamScore,
@@ -401,12 +439,22 @@ export async function classifyRagaWithTypeSafe(dspTelemetry, metadata = {}) {
   const pakadNoul = Number((answers.pakad_phrase_verified?.noul ?? 0.7).toFixed(3));
   const vadiNoul = Number((answers.vadi_samvadi_aligned?.noul ?? 0.7).toFixed(3));
 
+  // Siblings whose scales differ by at most one swara (e.g. Bhairav / Kalingda, Yaman / Yaman Kalyan)
+  // are a disambiguation, not an escalation
+  const sharesScale = (a, b) =>
+    a.swaras.filter((s) => !b.swaras.includes(s)).length + b.swaras.filter((s) => !a.swaras.includes(s)).length <= 1;
+
   let routingGate = 'AUTO_VERIFIED';
   let routingSummary =
     `High-confidence System One judgment (${Math.round(primaryConfidence * 100)}% confidence, ${separationRatio}x beam separation). ` +
     `Pakad motifs (${Math.round(pakadNoul * 100)}% noul) and Vadi/Samvadi hierarchy (${Math.round(vadiNoul * 100)}% noul) confirm ${winner.name}.`;
 
-  if (primaryConfidence < 0.48) {
+  if (winner.id === OUT_OF_CATALOG_ID) {
+    routingGate = 'OUT_OF_CATALOG';
+    routingSummary =
+      `No catalogued raga grammar fits this performance (closest: ${runnerUp.name}). ` +
+      `Observed scale ${winner.swaras.join(' ')} — ${winner.carnaticEquivalent}, nearest ${winner.thaat} Thaat.`;
+  } else if (primaryConfidence < 0.48 && !sharesScale(winner, runnerUp)) {
     routingGate = 'LOW_CONFIDENCE_ESCALATION';
     routingSummary =
       `Ambiguous scalar distribution (${Math.round(primaryConfidence * 100)}% confidence). ` +
@@ -429,6 +477,7 @@ export async function classifyRagaWithTypeSafe(dspTelemetry, metadata = {}) {
     winner,
     runnerUp,
     rankedCandidates,
+    scaleIdentity: dspTelemetry.scaleIdentity || identifyScale(dspTelemetry.scaleProfile.activeSwaras),
     routing: {
       gate: routingGate,
       primaryConfidence,

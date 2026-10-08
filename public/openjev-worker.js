@@ -182,7 +182,7 @@ async function evaluateRagaState({ state, catalogRagas, thaats }) {
     acoustic_candidate_shortlist: state.acoustic_candidate_shortlist?.slice(0, 5)
   }, null, 2);
 
-  // 1. Direct 1-token logit readout for primary_raga (12 options A..L)
+  // 1. Direct 1-token logit readout for primary_raga (acoustic shortlist + open-set option)
   const ragaOptions = catalogRagas.map((r) => ({
     key: r.id,
     description: `${r.name} (${r.thaat} Thaat) — Swaras: ${r.swaras.join(' ')}; Omitted: ${r.varjya.join(' ')}; Vadi: ${r.vadi}; Pakad: ${r.pakad}`
@@ -194,7 +194,7 @@ async function evaluateRagaState({ state, catalogRagas, thaats }) {
     ragaOptions
   );
 
-  // 2. Direct 1-token logit readout for thaat_family (9 options A..I)
+  // 2. Direct 1-token logit readout for thaat_family (10 options A..J)
   const thaatOptions = Object.entries(thaats).map(([key, desc]) => ({
     key,
     description: `${key} Thaat — ${desc}`

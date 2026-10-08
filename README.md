@@ -36,7 +36,31 @@ console.log(Object.keys(questions));
 // ['primary_raga', 'thaat_family', 'tradition_idiom', 'prahar_time_window', ...]
 ```
 
-`buildRagaSystemOnePayload()` compiles acoustic swara telemetry and the 12-raga musicological grammar into a single `POST /v1/systemone` state + questions object.
+`buildRagaSystemOnePayload()` compiles acoustic swara telemetry and the grammar of the top-12 acoustic candidates (plus an `out_of_catalog` option) into a single `POST /v1/systemone` state + questions object.
+
+## Raga coverage
+
+```js
+import { RAGA_CATALOG } from './src/raga-catalog.js';
+
+RAGA_CATALOG.length; // 962
+```
+
+The catalog has 12 hand-curated ragas with Pakad grammar, ~100 hand-written Hindustani and Carnatic janya ragas (`public/raga-lexicon.js`), ~790 more named ragas imported from Wikipedia (`public/raga-wiki-lexicon.js`), and all 72 Melakartas generated from the chakra formula. Every raga is scored acoustically, and the top 12 are sent to System One or OpenJev. If nothing in the catalog fits, `winner.id` is `out_of_catalog` and `routing.gate` is `OUT_OF_CATALOG`. `scaleIdentity` then reports the observed swaras, the nearest Thaat, and the parent Melakarta. Every 7-note scale with one Ma and Pa is a Melakarta, so those are always named. Any other linear scale is named by structure (e.g. "Audava-Sampurna janya of Hanumatodi"); `classifyJanyaScale()` resolves all 72 × 483 = 34,776 theoretical linear janyas to their parent Melakartas.
+
+Named ragas that share an identical scale (e.g. Madhyamavati and Megh) can't be told apart from pitch data alone. The DSP shortlists them; Jev separates them from phrasing.
+
+To add a raga, append a row to `JANYA_ROWS` in `public/raga-lexicon.js`. To refresh the Wikipedia import:
+
+```bash
+mkdir /tmp/raga-wiki && python3 -I scripts/import-wikipedia-ragas.py /tmp/raga-wiki public/raga-wiki-lexicon.js
+```
+
+Only `{{svaraC}}`/`{{svaraH}}` template scales are imported; plain-text notation is skipped because pages disagree on what `m` means.
+
+## Attribution
+
+Raga scales in `public/raga-wiki-lexicon.js` come from Wikipedia ([List of Janya ragas](https://en.wikipedia.org/wiki/List_of_Janya_ragas) and individual raga articles), licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ## BYOK and offline fallback
 

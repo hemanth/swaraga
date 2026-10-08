@@ -166,7 +166,7 @@ async function applyOpenJevToClassification(data) {
   }
 
   if (openjevStatusText) {
-    openjevStatusText.textContent = `Running ${targetModelId} 1-token direct logit readout (A..L)...`;
+    openjevStatusText.textContent = `Running ${targetModelId} 1-token direct logit readout over ${data.rankedCandidates.length} candidates...`;
   }
 
   const evalRes = await new Promise((resolve) => {
@@ -175,7 +175,8 @@ async function applyOpenJevToClassification(data) {
       type: 'evaluate',
       payload: {
         state: data.systemOneInspector.state,
-        catalogRagas: catalogData.ragas,
+        // Shortlisted candidates + open-set option (the full catalog exceeds the 1-token A..Z label space)
+        catalogRagas: data.rankedCandidates,
         thaats: catalogData.thaats
       }
     });
@@ -1512,11 +1513,27 @@ async function initStudio() {
       });
     });
 
-    // Render 12-Raga Grammar Matrix in Tab 2
+    // Render Raga Grammar Matrix in Tab 2 (curated ragas, janya lexicon, Wikipedia ragas, and 72 Melakartas)
     const catalogGrid = document.getElementById('catalog-grid');
-    catalogGrid.innerHTML = catalogData.ragas
-      .map(
-        (r) => `
+    const catalogCount = document.getElementById('catalog-count');
+    const CATALOG_PAGE = 60;
+    const renderCatalogGrid = (query = '') => {
+      const q = query.trim().toLowerCase();
+      const matches = q
+        ? catalogData.ragas.filter((r) =>
+            [r.name, ...(r.aliases || []), r.thaat, r.carnaticEquivalent, r.swaras.join(' ')]
+              .join(' | ')
+              .toLowerCase()
+              .includes(q)
+          )
+        : catalogData.ragas;
+      catalogCount.textContent = `${matches.length} of ${catalogData.ragas.length} ragas${
+        matches.length > CATALOG_PAGE ? ` · showing first ${CATALOG_PAGE}` : ''
+      }`;
+      catalogGrid.innerHTML = matches
+        .slice(0, CATALOG_PAGE)
+        .map(
+          (r) => `
         <div class="catalog-raga-card">
           <div class="choice-item-top">
             <h3>${r.name}</h3>
@@ -1531,8 +1548,11 @@ async function initStudio() {
           </div>
         </div>
       `
-      )
-      .join('');
+        )
+        .join('');
+    };
+    renderCatalogGrid();
+    document.getElementById('catalog-search').addEventListener('input', (e) => renderCatalogGrid(e.target.value));
 
     // Start on the clean input stage; only auto-classify if ?sample=... is passed in the URL
     const urlSample = new URLSearchParams(window.location.search).get('sample');
@@ -1547,7 +1567,7 @@ async function initStudio() {
     if (typeof navigator !== 'undefined' && 'modelContext' in navigator && navigator.modelContext?.registerTool) {
       navigator.modelContext.registerTool({
         name: 'list_ragas',
-        description: 'Return the 12 canonical Hindustani and Carnatic ragas, swarasthanas, parent Thaats, Vadi/Samvadi, and Pakad motifs.',
+        description: 'Return the raga catalog (~960 ragas: 12 curated, ~880 named Hindustani/Carnatic janya ragas, and all 72 Melakartas) with swarasthanas, parent Thaats, Vadi/Samvadi, and Pakad motifs.',
         parameters: {
           type: 'object',
           properties: {

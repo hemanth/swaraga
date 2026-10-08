@@ -12,10 +12,13 @@ Drop an MP3/WAV recording or sing into the microphone to classify Hindustani and
 ## Pipeline Architecture
 
 1. **01 Acoustic DSP Tier**: Decodes vocal audio at `16 kHz` via Web Audio API, locks the vocalist's tonic (`Sa`), tracks microtonal `F0` cent trajectories (`0–1200¢`), and extracts 12-Swara dwell shares, Arohana/Avarohana runs, and Pakad n-gram motifs.
-2. **02 System One Orchestrator**: Compiles acoustic telemetry and the 12-raga musicological grammar into 10 parallel primitives (`choice`, `score`, `noul`).
+2. **02 System One Orchestrator**: Scores the telemetry against a 962-raga catalog (12 curated ragas, ~880 named Hindustani/Carnatic janyas, all 72 Melakartas), then compiles the top-12 acoustic shortlist plus an open-set "unlisted raga" option into 10 parallel primitives (`choice`, `score`, `noul`).
 3. **03 Inference & Primitives**: Evaluates via TypeSafe Cloud (`POST /v1/systemone`, `jev-latest`) when a key is provided, or automatically loads and runs OpenJev Local (`@wllama/wllama` GGUF `Qwen3-0.6B`) in the browser with 1-token direct option logit readouts.
 
-## Canonical 12-Raga Catalog
+## Curated Raga Catalog
+
+These 12 ragas carry hand-written Pakad and Vadi/Samvadi grammar. The full catalog adds ~880 named janya ragas (a hand-written lexicon plus scales imported from Wikipedia's [List of Janya ragas](https://en.wikipedia.org/wiki/List_of_Janya_ragas) and raga articles, CC BY-SA 4.0) and all 72 Melakartas generated from the chakra formula. A performance that fits none of them is reported as an unlisted raga named by structure — e.g. "Audava-Sampurna janya of Hanumatodi" — which covers all 34,776 theoretical linear janyas.
+
 
 - **Raga Yaman** (Kalyan Thaat · Carnatic: Mechakalyani) — `S R2 G3 M2 P D2 N3` · Vadi `G3` / Samvadi `N3`
 - **Raga Bhairav** (Bhairav Thaat · Carnatic: Mayamalavagowla) — `S r1 G3 M1 P d1 N3` · Vadi `d1` / Samvadi `r1`
@@ -28,4 +31,4 @@ Drop an MP3/WAV recording or sing into the microphone to classify Hindustani and
 - **Raga Bhairavi** (Bhairavi Thaat · Carnatic: Hanumatodi) — `S r1 g2 M1 P d1 n2` · Vadi `M1` / Samvadi `S`
 - **Raga Desh** (Khamaj Thaat · Carnatic: Kedaram / Harikambhoji) — `S R2 G3 M1 P D2 n2 N3` · Vadi `R2` / Samvadi `P`
 - **Raga Puriya Dhanashri** (Poorvi Thaat · Carnatic: Pantuvarali) — `S r1 G3 M2 P d1 N3` · Vadi `P` / Samvadi `r1`
-- **Raga Bihag** (Bilawal Thaat · Carnatic: Behag) — `S R2 G3 M1 M2 P D2 N3` · Vadi `G3` / Samvadi `N3`
+- **Raga Bhimpalasi** (Kafi Thaat · Carnatic: Abheri) — `S R2 g2 M1 P D2 n2` · Vadi `M1` / Samvadi `S`
