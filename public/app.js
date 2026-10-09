@@ -1644,19 +1644,22 @@ async function initStudio() {
       }))
     };
 
-    // Probe if local Node server (for yt-dlp and .env key) is running
+    // Probe if local Node server (for yt-dlp and .env key) is running (localhost only)
     let hasServerKey = false;
-    try {
-      const probe = await fetch('./api/catalog', { method: 'GET' });
-      const contentType = probe.headers.get('content-type') || '';
-      if (probe.ok && contentType.includes('application/json')) {
-        const probeJson = await probe.json();
-        hasLocalBackend = Boolean(probeJson?.ragas);
-        hasServerKey = Boolean(probeJson?.engine?.liveJevReady);
+    const isLocalhost = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+    if (isLocalhost) {
+      try {
+        const probe = await fetch('./api/catalog', { method: 'GET' });
+        const contentType = probe.headers.get('content-type') || '';
+        if (probe.ok && contentType.includes('application/json')) {
+          const probeJson = await probe.json();
+          hasLocalBackend = Boolean(probeJson?.ragas);
+          hasServerKey = Boolean(probeJson?.engine?.liveJevReady);
+        }
+      } catch {
+        hasLocalBackend = false;
+        hasServerKey = false;
       }
-    } catch {
-      hasLocalBackend = false;
-      hasServerKey = false;
     }
 
     const ytFetchBar = document.querySelector('.youtube-fetch-bar');
